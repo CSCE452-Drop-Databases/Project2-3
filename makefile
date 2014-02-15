@@ -10,11 +10,19 @@ CC=g++
 
 all: main
 
-matrix.o: matrix.h matrix.cpp
-	$(CC) -c -g matrix.cpp 
+main: main.o paintarm.o matrix.o
+	$(CC) main.o paintarm.o matrix.o -o main
 
-main: main.cpp matrix.o
-	$(CC) main.cpp matrix.o -o main
+main.o: main.cpp
+	$(CC) -c -g main.cpp 
+
+paintarm.o: paintarm.cpp
+	$(CC) -c -g paintarm.cpp
+
+matrix.o: matrix.cpp
+	$(CC) -c -g matrix.cpp 
 
 clean:
 	rm -rf *.o main
+
+	

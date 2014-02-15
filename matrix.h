@@ -9,8 +9,6 @@
 */
 
 #pragma once
-#include <iostream>
-#include <stdio.h>
 
 #include "global_const.h"
 
@@ -20,7 +18,6 @@ class Matrix {
 		int row;
 		int col;
 		double** matrix;
-
 	public:
 		Matrix(int r, int c);
 		~Matrix();
@@ -33,3 +30,5 @@ class Matrix {
 
 		void print(std::ostream& os);
 };
+
+

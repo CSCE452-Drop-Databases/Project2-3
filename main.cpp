@@ -8,60 +8,40 @@
 
 */
 
-#include <iostream>
-#include "matrix.h"
 
-#include <cmath>
-
-double deci_round(double in) {
-	return round(in * 1000)/1000;
-}
-
-Matrix* matT_Z_rot(double theta_in_deg, double offset_x, double offset_y, double offset_z) {
-
-	double theta_in_rads = (theta_in_deg*DEG_TO_RADS);
-
-	Matrix* _t = new Matrix(DEFAULT_MATRIX_SIZE, DEFAULT_MATRIX_SIZE);
-
-	_t->assign_element(0, 0, deci_round(cos(theta_in_rads)));
-	_t->assign_element(0, 1, deci_round(-1*sin(theta_in_rads)));
-	_t->assign_element(0, 2, MATRIX_VALUE_ZERO);
-	_t->assign_element(0, 3, offset_x);
-
-	_t->assign_element(1, 0, deci_round(sin(theta_in_rads)));
-	_t->assign_element(1, 1, deci_round(cos(theta_in_rads)));
-	_t->assign_element(1, 2, MATRIX_VALUE_ZERO);
-	_t->assign_element(1, 3, offset_y);
-
-	_t->assign_element(2, 0, MATRIX_VALUE_ZERO);
-	_t->assign_element(2, 1, MATRIX_VALUE_ZERO);
-	_t->assign_element(2, 2, MATRIX_VALUE_ONE);
-	_t->assign_element(2, 3, offset_z);
-
-	_t->fill_bottom_row();
-	return _t;
-}
+#include "paintarm.h"
 
 int main () {
+	PaintArm _p = PaintArm();
 
-	Matrix* t_mat_base_to_joint_0 = matT_Z_rot(90, 0, 0, 0);
-	t_mat_base_to_joint_0->print(std::cout);
+	// T MATRICIES FOR EACH LINK
+	(_p.get_T_Matrix(0, 0))->print(std::cout);
+		// Base to first joint
+	(_p.get_T_Matrix(1, 1))->print(std::cout);
+		// First joint to second
+	(_p.get_T_Matrix(2, 2))->print(std::cout);
+		// Second joint to third
+	(_p.get_T_Matrix(3, 3))->print(std::cout);
+		// Third joint to brush head
 
-	Matrix* t_mat_joint_0_to_joint_1 = matT_Z_rot(-90, LINK_LENGTH_1, 0, 0);
-	t_mat_joint_0_to_joint_1->print(std::cout);
+	// FORWARD KINEMATICS T MATRICIES 
+	(_p.get_T_Matrix(0, 0))->print(std::cout);
+		// Base to first joint
+	(_p.get_T_Matrix(0, 1))->print(std::cout);
+		// Base to second joint
+	(_p.get_T_Matrix(0, 2))->print(std::cout);
+		// Base to third joint
+	(_p.get_T_Matrix(0, 3))->print(std::cout);
+		// Base to brush head
 
-	Matrix* t_mat_joint_1_to_joint_2 = matT_Z_rot(90, LINK_LENGTH_2, 0, 0);
-	t_mat_joint_1_to_joint_2->print(std::cout);
-
-	Matrix* t_mat_joint_2_to_joint_3 = matT_Z_rot(0, LINK_LENGTH_3, 0, 0);
-	t_mat_joint_2_to_joint_3->print(std::cout);
-
-	Matrix* t_mat_base_to_joint_3 = 
-		t_mat_base_to_joint_0->multiply(
-			t_mat_joint_0_to_joint_1->multiply(
-				t_mat_joint_1_to_joint_2->multiply(
-					t_mat_joint_2_to_joint_3)));
-
-	t_mat_base_to_joint_3->print(std::cout);
-
+	/*
+		The (x, y) coordinates can be extracted from
+		Forward Kinematics T matricies. Given the base
+		at (0, 0), the brush head can be found at 
+		(_p.get_T_Matrix(0, 3))[0][3] = x and
+		(_p.get_T_Matrix(0, 3))[1][3] = y.
+	*/
 }
+
+
+

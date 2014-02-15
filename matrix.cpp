@@ -24,6 +24,9 @@ Matrix::Matrix(int r, int c) {
 	for (int i = 0; i < row; ++i) {
 		matrix[i] =  new double[col];
 	}
+	for (int i = 0; (i < row && i < col); ++i) {
+		matrix[i][i] = 1;
+	}
 }
 
 Matrix::~Matrix() { 
@@ -42,6 +45,11 @@ Matrix* Matrix::multiply(Matrix* mat) {
 	Matrix* product = new Matrix(row, col);
 	for (int i = 0; i < row; ++i) {
 		for (int j = 0; j < col; ++j) {
+			product->matrix[i][j] = 0;
+		}
+	}
+	for (int i = 0; i < row; ++i) {
+		for (int j = 0; j < col; ++j) {
 			for (int k = 0; k < row; ++k) {
 				product->matrix[i][j] += (matrix[i][k] * mat->matrix[k][j]);
 			}
@@ -52,7 +60,7 @@ Matrix* Matrix::multiply(Matrix* mat) {
 
 void Matrix::assign_element(int r, int c, double val) {
 	if (r > row || c > col || r < 0 || c < 0) {
-		printf("ERROR :  Matrix Element Assignment :: Out of Bounds\n");
+		printf("ERROR :  Matrix Element Assignment :: Out of Bounds, row or col\n");
 		return;
 	}
 	matrix[r][c] = val;
@@ -97,3 +105,6 @@ void Matrix::print(std::ostream& os) {
 	}
 	os << '\n';
 }
+
+
+
