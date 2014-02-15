@@ -1,7 +1,7 @@
 /*
     File: matrix.h
 
-    Authors: Wesley Tang
+    Authors: Colton Williams, Charles Kernstock, Chris Murray, Paul Gaughan, Wesley Tang
             Department of Computer Science
             Texas A&M University
 		
