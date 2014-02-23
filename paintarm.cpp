@@ -15,13 +15,13 @@ double deci_round(double in) {
 }
 
 PaintArm::PaintArm() {
-	Matrix* t_mat_base_to_joint_0 = matT_Z_rot(90, 0, 0, 0);
+	Matrix* t_mat_base_to_joint_0 = matT_Z_rot(0, 0, 0, 0);
 	_T_Matrices.push_back(t_mat_base_to_joint_0);
 
-	Matrix* t_mat_joint_0_to_joint_1 = matT_Z_rot(-90, LINK_LENGTH_1, 0, 0);
+	Matrix* t_mat_joint_0_to_joint_1 = matT_Z_rot(90, LINK_LENGTH_1, 0, 0);
 	_T_Matrices.push_back(t_mat_joint_0_to_joint_1);
 
-	Matrix* t_mat_joint_1_to_joint_2 = matT_Z_rot(90, LINK_LENGTH_2, 0, 0);
+	Matrix* t_mat_joint_1_to_joint_2 = matT_Z_rot(0, LINK_LENGTH_2, 0, 0);
 	_T_Matrices.push_back(t_mat_joint_1_to_joint_2);
 
 	Matrix* t_mat_joint_2_to_joint_3 = matT_Z_rot(0, LINK_LENGTH_3, 0, 0);

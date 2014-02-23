@@ -21,8 +21,8 @@ double const DEG_TO_RADS = 3.14159265/180.0;
 int const MATRIX_VALUE_ONE = 1;
 int const MATRIX_VALUE_ZERO = 0;
 
-int const LINK_LENGTH_1 = 3;
-int const LINK_LENGTH_2 = 2;
-int const LINK_LENGTH_3 = 1;
+int const LINK_LENGTH_1 = 150;
+int const LINK_LENGTH_2 = 100;
+int const LINK_LENGTH_3 = 75;
 
 
