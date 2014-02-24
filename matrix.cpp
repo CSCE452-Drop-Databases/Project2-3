@@ -96,6 +96,11 @@ void Matrix::fill_bottom_row() {
 	matrix[(row - 1)][(col - 1)] = MATRIX_VALUE_ONE;
 }
 
+
+double Matrix::get_elem(int row, int col) {
+	return matrix[row][col];
+}
+
 void Matrix::print(std::ostream& os) {
 	for (int i = 0; i < row; ++i) {
 		for (int j = 0; j < col; ++j) {
