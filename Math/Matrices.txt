@@ -1,17 +1,17 @@
 There are 4 T matrices.
 
-The T-matrix for Link 0 is as follows.  x is the displacement.
+The T-matrix for Link 0 is as follows.  x is the displacement. This starts us off in vertical position.
 
-1 0 0 0
-0 1 0 0
+0 -1 0 0
+1 0  0 0
 0 0 1 x
 0 0 0 1
 
 
-The T-matrix for link 1 is as follows.
+The T-matrix for link 1 is as follows, since the joint-base doesn't rotate. 
 
-0 -1  0 150
-1  0  0  0
+1 0  0 150
+0  1  0  0
 0  0  1  0
 0  0  0  1
 

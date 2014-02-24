@@ -27,6 +27,7 @@ class Matrix {
 		void assign_rotation(Matrix* mat);
 		void assign_translation(Matrix* mat);
 		void fill_bottom_row();
+		double get_elem(int row, int col);
 
 		void print(std::ostream& os);
 };
