@@ -18,13 +18,13 @@ The T-matrix for link 1 is as follows, since the joint-base doesn't rotate.
 The T-matrix for link 2 is as follows.  Theta1 is the angle.
 
 cos(theta1) -sin(theta1) 0  100
-sin(theta1) -cos(theta1) 0  0
+sin(theta1) cos(theta1) 0  0
 0			0            1  0
 0			0            0  1
 
 The T-matrix for link 3 is as follows.  Theta2 is the angle.
 
 cos(theta2) -sin(theta2) 0 75
-sin(theta2) -cos(theta2) 0  0
+sin(theta2) cos(theta2) 0  0
 0			0            1  0
 0			0            0  1
