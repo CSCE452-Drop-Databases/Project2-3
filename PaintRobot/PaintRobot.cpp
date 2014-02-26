@@ -1,34 +1,6 @@
 /* implementation of button code adapted from http://nccastaff.bournemouth.ac.uk/jmacey/RobTheBloke/www/opengl_programming.html#6 */
+
 #include "stdafx.h"
-#include "Button.h"
-#include "Mouse.h"
-#include <vector>
-#include <gl/glut.h>
-
-#define WINDOW_TITLE "Paint Robot"
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
-
-// IMPORTANT NOTE: 3 * GUI_MARGIN_PERCENT + GUI_ROBOT_AREA_WIDTH_PERCENT + GUI_CONTROL_PANEL_WIDTH_PERCENT == 1.0
-#define GUI_MARGIN_PERCENT 0.025
-#define GUI_ROBOT_AREA_WIDTH_PERCENT 0.725
-#define GUI_CONTROL_PANEL_WIDTH_PERCENT 0.2
-
-// Slide that LINK_1 moves along
-#define SLIDE_LENGTH 300
-#define SLIDE_LOCATION_PERCENT 0.80 // percent from top of robot area slide
-
-
-int robotAreaWidth = WINDOW_WIDTH * GUI_ROBOT_AREA_WIDTH_PERCENT;
-int robotAreaHeight = WINDOW_HEIGHT * (1 - 2 * GUI_MARGIN_PERCENT);
-
-int controlPanelWidth = WINDOW_WIDTH * GUI_CONTROL_PANEL_WIDTH_PERCENT;
-int controlPanelHeight = WINDOW_HEIGHT * (1 - 2 * GUI_MARGIN_PERCENT);
-
-int slidePosX = (robotAreaWidth - SLIDE_LENGTH) / 2; // where the slider should start in relation to the robot area
-int slidePosY = SLIDE_LOCATION_PERCENT * robotAreaHeight;
-
-Mouse mouse = { 0, 0, 0, 0, 0 };
 
 struct Point {
 	int x, y;
@@ -40,7 +12,7 @@ typedef struct Point Point;
 std::vector<Button> controlPanelButtons;
 std::vector<Point> paint;
 
-
+Mouse mouse = { 0, 0, 0, 0, 0 };
 
 /*----------------------------------------------------------------------------------------
 *	\brief	This function draws a text string to the screen using glut bitmap fonts.
@@ -68,10 +40,6 @@ void font(void *font, char *text, int x, int y)
 		++text;
 	}
 }
-
-
-
-
 
 /*----------------------------------------------------------------------------------------
 *	\brief	This function is used to see if a mouse click or event is within a button
@@ -104,7 +72,7 @@ int ButtonClickTest(Button* b, int x, int y)
 }
 
 /*----------------------------------------------------------------------------------------
-*	\brief	This function draws the specified button.
+*	\brief	This function checks if the mouse button was released in the button
 *	\param	b	-	a pointer to the button to check.
 *	\param	x	-	the x location of the mouse cursor.
 *	\param	y	-	the y location of the mouse cursor.
@@ -127,9 +95,6 @@ void ButtonRelease(Button *b, int x, int y)
 				b->callbackFunction();
 			}
 		}
-		else {
-			//printf("Button %s : BRRRZZZ\n", b->label);
-		}
 
 		/*
 		*	Set state back to zero.
@@ -139,7 +104,7 @@ void ButtonRelease(Button *b, int x, int y)
 }
 
 /*----------------------------------------------------------------------------------------
-*	\brief	This function draws the specified button.
+*	\brief	This function checks if the button is being pressed
 *	\param	b	-	a pointer to the button to check.
 *	\param	x	-	the x location of the mouse cursor.
 *	\param	y	-	the y location of the mouse cursor.
@@ -159,10 +124,8 @@ void ButtonPress(Button *b, int x, int y)
 	}
 }
 
-
-
 /*----------------------------------------------------------------------------------------
-*	\brief	This function draws the specified button.
+*	\brief	This function checks if the mouse is currently over the button
 *	\param	b	-	a pointer to the button to check.
 *	\param	x	-	the x location of the mouse cursor.
 *	\param	y	-	the y location of the mouse cursor.
@@ -342,15 +305,9 @@ void drawRobotAreaContents() {
 
 void drawControlPanelContents() {
 	// draw the controls
-	char* cpTitle = "Control Panel";
-	char* cpAxis1Title = "Axis 1";
-	char* cpAxis2Title = "Axis 2";
-	char* cpAxis3Title = "Axis 3";
-	char* cpPaintBrushTitle = "Paint Brush";
-	
 	int cpTitleX = (controlPanelWidth - glutBitmapLength(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)cpTitle)) / 2;
 	int cpTitleY = 0.05 * controlPanelHeight;
-	// 10, 25, 40, 55
+	
 	int cpAxis1TitleX = (controlPanelWidth - glutBitmapLength(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)cpAxis1Title)) / 2;
 	int cpAxis1TitleY = 0.12 * controlPanelHeight;
 

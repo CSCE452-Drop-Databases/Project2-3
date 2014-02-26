@@ -5,11 +5,21 @@
 
 #pragma once
 
-#include "targetver.h"
-
 #include <stdio.h>
 #include <tchar.h>
 
+#include <cmath>
+#include <iostream>
+#include <vector>
+#include "Button.h"
+#include "Mouse.h"
+#include "global_const.h"
 
+#ifdef _WIN32
+#include "targetver.h"
+#include <gl/glut.h>
+#endif
 
-// TODO: reference additional headers your program requires here
+#ifdef __linux__
+#include <GL/glut.h>
+#endif
