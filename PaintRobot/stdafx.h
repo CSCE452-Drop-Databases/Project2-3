@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "global_const.h"
+
 #include <stdio.h>
 #include <tchar.h>
 
@@ -13,7 +15,8 @@
 #include <vector>
 #include "Button.h"
 #include "Mouse.h"
-#include "global_const.h"
+#include "Matrix.h"
+#include "PaintArm.h"
 
 #ifdef _WIN32
 #include "targetver.h"

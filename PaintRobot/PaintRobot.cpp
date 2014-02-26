@@ -8,6 +8,7 @@ struct Point {
 };
 typedef struct Point Point;
 
+PaintArm paintArm;
 
 std::vector<Button> controlPanelButtons;
 std::vector<Point> paint;
@@ -299,6 +300,16 @@ void drawRobotAreaContents() {
 	glEnd();
 
 	// TODO: Draw the rest of the robot
+	//Matrix* paintArmAxis01 = paintArm.get_T_Matrix(1, 1);
+	//Matrix* paintArmAxis02 = paintArm.get_T_Matrix(0, 2);
+
+	//printf("01X: %d, 01Y: %d\n", paintArmAxis01->get_elem(0, 3), paintArmAxis01->get_elem(1, 3));
+	//printf("01X: %d, 01Y: %d\n", paintArmAxis02->get_elem(0, 3), paintArmAxis02->get_elem(1, 3));
+
+	//glBegin(GL_LINES);
+	//glVertex2f(paintArmAxis01->get_elem(0, 3), paintArmAxis01->get_elem(1, 3));
+	//glVertex2f(paintArmAxis02->get_elem(0, 3), paintArmAxis02->get_elem(1, 3));
+	//glEnd();
 
 	glPopMatrix();
 }
@@ -587,6 +598,16 @@ void initGraphics() {
 	gluOrtho2D(0, WINDOW_WIDTH - 1, WINDOW_HEIGHT - 1, 0);
 }
 
+void initPaintArm() {
+	(paintArm.get_T_Matrix(0, 0))->print(std::cout);
+	// Base to first joint
+	(paintArm.get_T_Matrix(1, 1))->print(std::cout);
+	// First joint to second
+	(paintArm.get_T_Matrix(2, 2))->print(std::cout);
+	// Second joint to third
+	(paintArm.get_T_Matrix(3, 3))->print(std::cout);
+}
+
 int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
@@ -601,6 +622,7 @@ int main(int argc, char **argv)
 
 	initGraphics();
 	initButtons();
+	initPaintArm();
 
 	glutMainLoop();
 }

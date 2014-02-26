@@ -82,11 +82,15 @@
   <ItemGroup>
     <ClInclude Include="Button.h" />
     <ClInclude Include="global_const.h" />
+    <ClInclude Include="Matrix.h" />
     <ClInclude Include="Mouse.h" />
+    <ClInclude Include="PaintArm.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Matrix.cpp" />
+    <ClCompile Include="PaintArm.cpp" />
     <ClCompile Include="PaintRobot.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
