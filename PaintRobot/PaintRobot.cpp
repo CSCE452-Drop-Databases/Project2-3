@@ -484,9 +484,9 @@ void draw() {
 void axis1IncrementButtonCallback() {
 	// move axis1 1px right
 	printf("Axis 1 Increment Button Pressed!\n");
-	if (abs(tNum) < SLIDE_LENGTH / 2) {
-		paintArm.translate(0, 1, 0);
-		tNum++;
+	if (abs(tNum + SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
+		paintArm.translate(0, SLIDE_AMOUNT, 0);
+		tNum += SLIDE_AMOUNT;
 		glutPostRedisplay();
 	}
 	else {
@@ -498,9 +498,9 @@ void axis1IncrementButtonCallback() {
 void axis1DecrementButtonCallback() {
 	// move axis1 1px left
 	printf("Axis 1 Decrement Button Pressed!\n");
-	if (abs(tNum) < SLIDE_LENGTH / 2) {
-		paintArm.translate(0, -1, 0);
-		tNum--;
+	if (abs(tNum - SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
+		paintArm.translate(0, -SLIDE_AMOUNT, 0);
+		tNum -= SLIDE_AMOUNT;
 		glutPostRedisplay();
 	}
 	else {
@@ -511,28 +511,28 @@ void axis1DecrementButtonCallback() {
 void axis2IncrementButtonCallback() {
 	// rotate axis2 +1 degree
 	printf("Axis 2 Increment Button Pressed!\n");
-	paintArm.rotate(1, -1);
+	paintArm.rotate(1, -ROTATE_AMOUNT);
 	glutPostRedisplay();
 }
 
 void axis2DecrementButtonCallback() {
 	// rotate axis2 -1 degree
 	printf("Axis 2 Decrement Button Pressed!\n");
-	paintArm.rotate(1, 1);
+	paintArm.rotate(1, ROTATE_AMOUNT);
 	glutPostRedisplay();
 }
 
 void axis3IncrementButtonCallback() {
 	// rotate axis3 +1 degree
 	printf("Axis 3 Increment Button Pressed!\n");
-	paintArm.rotate(2, -1);
+	paintArm.rotate(2, -ROTATE_AMOUNT);
 	glutPostRedisplay();
 }
 
 void axis3DecrementButtonCallback() {
 	// rotate axis3 -1 degree
 	printf("Axis 3 Decrement Button Pressed!\n");
-	paintArm.rotate(2, 1);
+	paintArm.rotate(2, ROTATE_AMOUNT);
 	glutPostRedisplay();
 }
 

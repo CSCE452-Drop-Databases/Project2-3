@@ -51,3 +51,6 @@ int const MATRIX_VALUE_ZERO = 0;
 int const LINK_LENGTH_1 = 150;
 int const LINK_LENGTH_2 = 100;
 int const LINK_LENGTH_3 = 75;
+
+int const ROTATE_AMOUNT = 1;
+int const SLIDE_AMOUNT = 1;
