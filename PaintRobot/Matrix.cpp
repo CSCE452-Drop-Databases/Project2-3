@@ -22,9 +22,13 @@ Matrix::Matrix(int r, int c) {
 		row = r;
 		col = c;
 	}
-	matrix = new double*[row];
+
+	std::vector<double> tempRow(row, 0);
+
+	//matrix = new double*[row];
 	for (int i = 0; i < row; ++i) {
-		matrix[i] = new double[col];
+		//matrix[i] = new double[col];
+		matrix.push_back(tempRow);
 	}
 	for (int i = 0; (i < row && i < col); ++i) {
 		matrix[i][i] = 1;
@@ -32,10 +36,10 @@ Matrix::Matrix(int r, int c) {
 }
 
 Matrix::~Matrix() {
-	for (int i = 0; i < row; ++i) {
+	/*for (int i = 0; i < row; ++i) {
 		delete[] matrix[i];
 	}
-	delete[] matrix;
+	delete[] matrix;*/
 }
 
 

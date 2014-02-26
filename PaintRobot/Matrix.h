@@ -17,7 +17,7 @@ private:
 protected:
 	int row;
 	int col;
-	double** matrix;
+	std::vector<std::vector<double> > matrix;
 public:
 	Matrix(int r, int c);
 	~Matrix();

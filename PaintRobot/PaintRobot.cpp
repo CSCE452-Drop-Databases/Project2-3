@@ -15,6 +15,8 @@ std::vector<Point> paint;
 
 Mouse mouse = { 0, 0, 0, 0, 0 };
 
+int tNum = 0;
+
 /*----------------------------------------------------------------------------------------
 *	\brief	This function draws a text string to the screen using glut bitmap fonts.
 *	\param	font	-	the font to use. it can be one of the following :
@@ -290,6 +292,59 @@ void gotoControlPanel() {
 	glTranslatef(WINDOW_WIDTH * (1 - GUI_MARGIN_PERCENT) - WINDOW_WIDTH * GUI_CONTROL_PANEL_WIDTH_PERCENT, WINDOW_HEIGHT * GUI_MARGIN_PERCENT, 0.0f);
 }
 
+void drawEllipse(float xc, float yc, float x, float y)
+{
+	int p1[] = { (int)xc + x, (int)yc + y };
+	int p2[] = { (int)xc - x, (int)yc + y };
+	int p3[] = { (int)xc + x, (int)yc - y };
+	int p4[] = { (int)xc - x, (int)yc - y };
+	glVertex2iv(p1);
+	glVertex2iv(p2);
+	glVertex2iv(p3);
+	glVertex2iv(p4);
+}
+
+void ellipseMidpoint(float xc, float yc, float rx, float ry)
+{
+	float rxSq = rx * rx;
+	float rySq = ry * ry;
+	float x = 0, y = ry, p;
+	float px = 0, py = 2 * rxSq * y;
+	drawEllipse(xc, yc, x, y);
+
+	p = rySq - (rxSq * ry) + (0.25 * rxSq);
+	while (px < py)
+	{
+		x++;
+		px = px + 2 * rySq;
+		if (p < 0)
+			p = p + rySq + px;
+		else
+		{
+			y--;
+			py = py - 2 * rxSq;
+			p = p + rySq + px - py;
+		}
+		drawEllipse(xc, yc, x, y);
+	}
+
+	p = rySq*(x + 0.5)*(x + 0.5) + rxSq*(y - 1)*(y - 1) - rxSq*rySq;
+	while (y > 0)
+	{
+		y--;
+		py = py - 2 * rxSq;
+		if (p > 0)
+			p = p + rxSq - py;
+		else
+		{
+			x++;
+			px = px + 2 * rySq;
+			p = p + rxSq - py + px;
+		}
+		drawEllipse(xc, yc, x, y);
+	}
+}
+
 void drawRobotAreaContents() {
 	// draw the robot
 	glPushMatrix();
@@ -299,17 +354,44 @@ void drawRobotAreaContents() {
 		glVertex2f(slidePosX + SLIDE_LENGTH, slidePosY);
 	glEnd();
 
-	// TODO: Draw the rest of the robot
-	//Matrix* paintArmAxis01 = paintArm.get_T_Matrix(1, 1);
-	//Matrix* paintArmAxis02 = paintArm.get_T_Matrix(0, 2);
+	glTranslatef(slidePosX + SLIDE_LENGTH / 2, slidePosY, 0.0f); // Translate to middle of bar (robot origin)
 
-	//printf("01X: %d, 01Y: %d\n", paintArmAxis01->get_elem(0, 3), paintArmAxis01->get_elem(1, 3));
-	//printf("01X: %d, 01Y: %d\n", paintArmAxis02->get_elem(0, 3), paintArmAxis02->get_elem(1, 3));
 
-	//glBegin(GL_LINES);
-	//glVertex2f(paintArmAxis01->get_elem(0, 3), paintArmAxis01->get_elem(1, 3));
-	//glVertex2f(paintArmAxis02->get_elem(0, 3), paintArmAxis02->get_elem(1, 3));
-	//glEnd();
+	for (Point p : paint) {
+		glBegin(GL_LINES);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		ellipseMidpoint(p.x, -p.y, 5, 5);
+		glEnd();
+	}
+	
+	Matrix* paintArmAxis00 = paintArm.get_T_Matrix(0, 0);
+	Matrix* paintArmAxis01 = paintArm.get_T_Matrix(0, 1);
+	Matrix* paintArmAxis02 = paintArm.get_T_Matrix(0, 2);
+	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
+	
+	double paintArmAxis00X = paintArmAxis01->get_elem(0, 3);
+	double paintArmAxis00Y = paintArmAxis01->get_elem(1, 3);
+
+	double paintArmAxis01X = paintArmAxis01->get_elem(0, 3);
+	double paintArmAxis01Y = paintArmAxis01->get_elem(1, 3);
+
+	double paintArmAxis02X = paintArmAxis02->get_elem(0, 3);
+	double paintArmAxis02Y = paintArmAxis02->get_elem(1, 3);
+
+	double paintArmAxis03X = paintArmAxis03->get_elem(0, 3);
+	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
+
+	glBegin(GL_LINE_STRIP);
+	glVertex2f(tNum, 0);
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glVertex2f(paintArmAxis01X, -paintArmAxis01Y);
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex2f(paintArmAxis02X, -paintArmAxis02Y);
+	glColor3f(0.0f, 1.0f, 1.0f);
+	glVertex2f(paintArmAxis03X, -paintArmAxis03Y);
+	glEnd();
+
+	
 
 	glPopMatrix();
 }
@@ -402,38 +484,67 @@ void draw() {
 void axis1IncrementButtonCallback() {
 	// move axis1 1px right
 	printf("Axis 1 Increment Button Pressed!\n");
+	if (abs(tNum) < SLIDE_LENGTH / 2) {
+		paintArm.translate(0, 1, 0);
+		tNum++;
+		glutPostRedisplay();
+	}
+	else {
+		std::cout << "ERROR: Cannot move base off of slide!" << std::endl;
+	}
+	
 }
 
 void axis1DecrementButtonCallback() {
 	// move axis1 1px left
 	printf("Axis 1 Decrement Button Pressed!\n");
+	if (abs(tNum) < SLIDE_LENGTH / 2) {
+		paintArm.translate(0, -1, 0);
+		tNum--;
+		glutPostRedisplay();
+	}
+	else {
+		std::cout << "ERROR: Cannot move base off of slide!" << std::endl;
+	}
 }
 
 void axis2IncrementButtonCallback() {
 	// rotate axis2 +1 degree
 	printf("Axis 2 Increment Button Pressed!\n");
+	paintArm.rotate(1, -1);
+	glutPostRedisplay();
 }
 
 void axis2DecrementButtonCallback() {
 	// rotate axis2 -1 degree
 	printf("Axis 2 Decrement Button Pressed!\n");
+	paintArm.rotate(1, 1);
+	glutPostRedisplay();
 }
 
 void axis3IncrementButtonCallback() {
 	// rotate axis3 +1 degree
 	printf("Axis 3 Increment Button Pressed!\n");
+	paintArm.rotate(2, -1);
+	glutPostRedisplay();
 }
 
 void axis3DecrementButtonCallback() {
 	// rotate axis3 -1 degree
 	printf("Axis 3 Decrement Button Pressed!\n");
+	paintArm.rotate(2, 1);
+	glutPostRedisplay();
 }
 
 void paintButtonCallback() {
 	// add a new circle to paint
 	printf("Paint Button Pressed!\n");
 	// TODO: Get paint brush x,y coordinates
-	//paint.push_back(Point(x,y));
+	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
+	double paintArmAxis03X = paintArmAxis03->get_elem(0, 3);
+	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
+	paint.push_back(Point(paintArmAxis03X, paintArmAxis03Y));
+	std::cout << "paint.size() = " << paint.size() << " | (" << paint[paint.size()-1].x << ", " << paint[paint.size()-1].y << ")" << std::endl;
 }
 
 
@@ -598,16 +709,6 @@ void initGraphics() {
 	gluOrtho2D(0, WINDOW_WIDTH - 1, WINDOW_HEIGHT - 1, 0);
 }
 
-void initPaintArm() {
-	(paintArm.get_T_Matrix(0, 0))->print(std::cout);
-	// Base to first joint
-	(paintArm.get_T_Matrix(1, 1))->print(std::cout);
-	// First joint to second
-	(paintArm.get_T_Matrix(2, 2))->print(std::cout);
-	// Second joint to third
-	(paintArm.get_T_Matrix(3, 3))->print(std::cout);
-}
-
 int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
@@ -622,7 +723,6 @@ int main(int argc, char **argv)
 
 	initGraphics();
 	initButtons();
-	initPaintArm();
 
 	glutMainLoop();
 }
