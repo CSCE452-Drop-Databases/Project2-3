@@ -301,6 +301,24 @@ void gotoControlPanel() {
 	glTranslatef(WINDOW_WIDTH * (1 - GUI_MARGIN_PERCENT) - WINDOW_WIDTH * GUI_CONTROL_PANEL_WIDTH_PERCENT, WINDOW_HEIGHT * GUI_MARGIN_PERCENT, 0.0f);
 }
 
+//Paints an ellipse that is vertically long
+void paintArmEllipse(float center_x, float center_y, float radius_y, float width) {
+	float const PI = 3.14159265;
+	//radius_y is longest radius of ellipse
+	//width of ellipse given as a proportion of height
+	glBegin(GL_TRIANGLE_FAN);
+	int sides = radius_y * 32;
+	glVertex2f(center_x, center_y);
+	for (int i = 0; i <= sides - 1; i++) {
+		double theta = 2 * PI * i / sides;
+		double point_x = (i / sides + width) * radius_y * cos(theta);
+		double point_y = radius_y * sin(theta);
+		glVertex2f(center_x + point_x, center_y + point_y);
+	}
+	glEnd();
+	glFlush();
+}
+
 void drawEllipse(float xc, float yc, float x, float y)
 {
 	int p1[] = { (int)xc + x, (int)yc + y };
@@ -360,7 +378,6 @@ void drawRobotAreaContents() {
 	gotoRobotArea();
 
 	glTranslatef(slidePosX + SLIDE_LENGTH / 2, slidePosY, 0.0f); // Translate to middle of bar (robot origin)
-
 
 	for (Point p : paint) {
 		glBegin(GL_LINES);
