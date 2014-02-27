@@ -11,39 +11,50 @@
 
 #include "paintarm.h"
 
-int main () {
+int main() {
 	PaintArm _p = PaintArm();
 
 	std::cout << "Invidiaul T Matricies\n";
 	// T MATRICIES FOR EACH LINK
 	(_p.get_T_Matrix(0, 0))->print(std::cout);
-		// Base to first joint
+	// Base to first joint
 	(_p.get_T_Matrix(1, 1))->print(std::cout);
-		// First joint to second
+	// First joint to second
 	(_p.get_T_Matrix(2, 2))->print(std::cout);
-		// Second joint to third
+	// Second joint to third
 	(_p.get_T_Matrix(3, 3))->print(std::cout);
-		// Third joint to brush head
+	// Third joint to brush head
 
-	std::cout << "Forward Kinematrics\n";	
+	std::cout << "Forward Kinematrics\n";
 	// FORWARD KINEMATICS T MATRICIES 
 	(_p.get_T_Matrix(0, 0))->print(std::cout);
-		// Base to first joint
+	// Base to first joint
 	(_p.get_T_Matrix(0, 1))->print(std::cout);
-		// Base to second joint
+	// Base to second joint
 	(_p.get_T_Matrix(0, 2))->print(std::cout);
-		// Base to third joint
+	// Base to third joint
 	(_p.get_T_Matrix(0, 3))->print(std::cout);
-		// Base to brush head
+	// Base to brush head
 
-	std::cout << "ROTATING JOINT 1 BY 90\n";
-	_p.rotate(1, 90);
+	/*
+	for (int i = 0; i < 8; ++i) {
+		std::cout << "ROTATING JOINT 1 BY 45\n";
+		_p.rotate(0, 45);
+
+		(_p.get_T_Matrix(0, 0))->print(std::cout);
+		(_p.get_T_Matrix(0, 1))->print(std::cout);
+		(_p.get_T_Matrix(0, 2))->print(std::cout);
+		(_p.get_T_Matrix(0, 3))->print(std::cout);
+	}*/
+	std::cout << "ROTATING JOINT 1 BY -90\n";
+	_p.rotate(0, 60);
 
 	(_p.get_T_Matrix(0, 0))->print(std::cout);
 	(_p.get_T_Matrix(0, 1))->print(std::cout);
 	(_p.get_T_Matrix(0, 2))->print(std::cout);
 	(_p.get_T_Matrix(0, 3))->print(std::cout);
 
+	/*
 	std::cout << "TRANSLATING BASE BY 2\n";
 	_p.translate(0, 2, 0);
 
@@ -51,6 +62,8 @@ int main () {
 	(_p.get_T_Matrix(0, 1))->print(std::cout);
 	(_p.get_T_Matrix(0, 2))->print(std::cout);
 	(_p.get_T_Matrix(0, 3))->print(std::cout);
+	*/
+	
 
 	/*
 		The (x, y) coordinates can be extracted from

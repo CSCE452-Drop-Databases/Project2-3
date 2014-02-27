@@ -1,16 +1,14 @@
 /*
-File: matrix.cpp
+    File: matrix.cpp
 
-Authors: Colton Williams, Charles Kernstock, Chris Murray, Paul Gaughan, Wesley Tang
-Department of Computer Science
-Texas A&M University
-
+    Authors: Colton Williams, Charles Kernstock, Chris Murray, Paul Gaughan, Wesley Tang
+            Department of Computer Science
+            Texas A&M University
+		
 
 */
 
-#include "stdafx.h"
-
-//#include "Matrix.h"
+#include "matrix.h"
 
 Matrix::Matrix(int r, int c) {
 	if (r <= 0 || c <= 0) {
@@ -22,24 +20,25 @@ Matrix::Matrix(int r, int c) {
 		row = r;
 		col = c;
 	}
-
-	std::vector<double> tempRow(row, 0);
-
-	//matrix = new double*[row];
+	matrix = new double*[row];
 	for (int i = 0; i < row; ++i) {
-		//matrix[i] = new double[col];
-		matrix.push_back(tempRow);
+		matrix[i] =  new double[col];
+	}
+	for (int i = 0; i < row; ++i) {
+		for (int j = 0; j < col; ++j) {
+			matrix[i][j] = 0;
+		}
 	}
 	for (int i = 0; (i < row && i < col); ++i) {
 		matrix[i][i] = 1;
 	}
 }
 
-Matrix::~Matrix() {
-	/*for (int i = 0; i < row; ++i) {
+Matrix::~Matrix() { 
+	for (int i = 0; i < row; ++i) {
 		delete[] matrix[i];
 	}
-	delete[] matrix;*/
+	delete[] matrix; 
 }
 
 
@@ -77,7 +76,7 @@ void Matrix::assign_rotation(Matrix* mat) {
 	if (mat->row < (row - 1) || mat->col < (col - 1)) {
 		printf("ERROR :  Matrix Rotation Assignment :: Invalid Input Rotation Matrix\n");
 		return;
-	}
+	}		
 	for (int i = 0; i < (row - 1); ++i) {
 		for (int j = 0; j < (col - 1); ++j) {
 			matrix[i][j] = mat->matrix[i][j];
@@ -89,7 +88,7 @@ void Matrix::assign_translation(Matrix* mat) {
 	if (mat->row < (row - 1)) {
 		printf("ERROR :  Matrix Translation Assignment :: Invalid Input Translation Matrix\n");
 		return;
-	}
+	}	
 	for (int i = 0; i < (row - 1); ++i) {
 		matrix[i][(col - 1)] = mat->matrix[i][(mat->col - 1)];
 	}
@@ -103,8 +102,8 @@ void Matrix::fill_bottom_row() {
 }
 
 
-double Matrix::get_elem(int row, int col) {
-	return matrix[row][col];
+double Matrix::get_elem(int r, int c) {
+	return matrix[r][c];
 }
 
 void Matrix::print(std::ostream& os) {

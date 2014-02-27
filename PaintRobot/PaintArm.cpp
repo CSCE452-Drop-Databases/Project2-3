@@ -1,23 +1,22 @@
 /*
-File: paintarm.cpp
+    File: paintarm.cpp
 
-Authors: Colton Williams, Charles Kernstock, Chris Murray, Paul Gaughan, Wesley Tang
-Department of Computer Science
-Texas A&M University
-
+    Authors: Colton Williams, Charles Kernstock, Chris Murray, Paul Gaughan, Wesley Tang
+            Department of Computer Science
+            Texas A&M University
+		
 
 */
 
-#include "stdafx.h"
-
-//#include "PaintArm.h"
+#include "paintarm.h"
 
 double deci_round(double in) {
-	return round(in * 1000000) / 1000000;
+	return round(in * 1000000)/1000000;
 }
 
 PaintArm::PaintArm() {
 	_T_Matrices.clear();
+	base_to_n.clear();
 
 	Matrix* t_mat_base_to_joint_0 = matT_Z_rot(90, 0, 0, 0);
 	_T_Matrices.push_back(t_mat_base_to_joint_0);
@@ -57,7 +56,7 @@ Matrix* PaintArm::get_T_Matrix(int start_index, int end_index) {
 		return _T_Matrices[start_index];
 	}
 	if (start_index == 0) {
-		return base_to_n[end_index + 1];
+		return base_to_n[end_index+1];
 	}
 	printf("ERROR :  PaintArm get_T_Matrix :: NO IMPLEMENTATION FOR GIVEN PARAMETERS, DEAL WITH IT.\n");
 	return base_to_n[0]; // Identity Matrix
@@ -67,20 +66,20 @@ void PaintArm::rotate(int joint_index, double rotation_in_deg) {
 	if (joint_index >= num_of_joints) {
 		printf("ERROR :  PaintArm rotate :: Out of Bounds, joint_index\n");
 		return;
-	}
+	}/*
 	if (joint_index == 0) {
 		printf("ERROR :  PaintArm rotate :: Do not rotate base please\n");
 		return;
-	}
+	}*/
 	double theta_in_rads = (rotation_in_deg*DEG_TO_RADS);
-	int a_00 = _T_Matrices[joint_index]->get_elem(0, 0);
+	double a_00 = _T_Matrices[joint_index]->get_elem(0, 0);
 	_T_Matrices[joint_index]->assign_element(0, 0, deci_round(cos(acos(a_00) + theta_in_rads)));
-	int a_01 = _T_Matrices[joint_index]->get_elem(0, 1);
-	_T_Matrices[joint_index]->assign_element(0, 1, deci_round(-1 * sin((-1 * asin(a_01)) + theta_in_rads)));
+	double a_01 = _T_Matrices[joint_index]->get_elem(0, 1);
+	_T_Matrices[joint_index]->assign_element(0, 1, deci_round(-1.0*sin((asin(a_01*-1.0)) + theta_in_rads)));
 
-	int a_10 = _T_Matrices[joint_index]->get_elem(1, 0);
+	double a_10 = _T_Matrices[joint_index]->get_elem(1, 0);
 	_T_Matrices[joint_index]->assign_element(1, 0, deci_round(sin(asin(a_10) + theta_in_rads)));
-	int a_11 = _T_Matrices[joint_index]->get_elem(1, 1);
+	double a_11 = _T_Matrices[joint_index]->get_elem(1, 1);
 	_T_Matrices[joint_index]->assign_element(1, 1, deci_round(cos(acos(a_11) + theta_in_rads)));
 
 	for (int i = 0; i < base_to_n.size(); ++i) {
@@ -90,9 +89,9 @@ void PaintArm::rotate(int joint_index, double rotation_in_deg) {
 	for (int i = 0; i <= num_of_joints; ++i) {
 		base_to_n.push_back(matT_base_to_joint_n(i));
 	}
-
+	
 	// I DON'T KNOW WHY I HAVE TO DO THIS BUT IT MAKES IT WORK
-	base_to_n[joint_index + 1] = matT_base_to_joint_n(joint_index + 1);
+	base_to_n[joint_index+1] = matT_base_to_joint_n(joint_index+1);
 	// I DON'T KNOW WHY I HAVE TO DO THIS BUT IT MAKES IT WORK
 }
 
@@ -105,9 +104,9 @@ void PaintArm::translate(int joint_index, int x, int y) {
 		printf("ERROR :  PaintArm rotate :: Do not translate nonprismatic joints please\n");
 		return;
 	}
-	int old_x = _T_Matrices[joint_index]->get_elem(0, 3);
+	double old_x = _T_Matrices[joint_index]->get_elem(0, 3);
 	_T_Matrices[joint_index]->assign_element(0, 3, (x + old_x));
-	int old_y = _T_Matrices[joint_index]->get_elem(1, 3);
+	double old_y = _T_Matrices[joint_index]->get_elem(1, 3);
 	_T_Matrices[joint_index]->assign_element(1, 3, (y + old_y));
 
 	for (int i = 0; i < base_to_n.size(); ++i) {
@@ -119,7 +118,7 @@ void PaintArm::translate(int joint_index, int x, int y) {
 	}
 
 	// I DON'T KNOW WHY I HAVE TO DO THIS BUT IT MAKES IT WORK
-	base_to_n[joint_index + 2] = matT_base_to_joint_n(joint_index + 2);
+	base_to_n[joint_index+2] = matT_base_to_joint_n(joint_index+2);
 	// I DON'T KNOW WHY I HAVE TO DO THIS BUT IT MAKES IT WORK
 }
 
@@ -130,7 +129,7 @@ Matrix* PaintArm::matT_Z_rot(double theta_in_deg, double offset_x, double offset
 	Matrix* _t = new Matrix(DEFAULT_MATRIX_SIZE, DEFAULT_MATRIX_SIZE);
 
 	_t->assign_element(0, 0, deci_round(cos(theta_in_rads)));
-	_t->assign_element(0, 1, deci_round(-1 * sin(theta_in_rads)));
+	_t->assign_element(0, 1, deci_round(-1*sin(theta_in_rads)));
 	_t->assign_element(0, 2, MATRIX_VALUE_ZERO);
 	_t->assign_element(0, 3, offset_x);
 

@@ -16,6 +16,7 @@ double deci_round(double in) {
 
 PaintArm::PaintArm() {
 	_T_Matrices.clear();
+	base_to_n.clear();
 
 	Matrix* t_mat_base_to_joint_0 = matT_Z_rot(90, 0, 0, 0);
 	_T_Matrices.push_back(t_mat_base_to_joint_0);
@@ -65,20 +66,20 @@ void PaintArm::rotate(int joint_index, double rotation_in_deg) {
 	if (joint_index >= num_of_joints) {
 		printf("ERROR :  PaintArm rotate :: Out of Bounds, joint_index\n");
 		return;
-	}
+	}/*
 	if (joint_index == 0) {
 		printf("ERROR :  PaintArm rotate :: Do not rotate base please\n");
 		return;
-	}
+	}*/
 	double theta_in_rads = (rotation_in_deg*DEG_TO_RADS);
-	int a_00 = _T_Matrices[joint_index]->get_elem(0, 0);
+	double a_00 = _T_Matrices[joint_index]->get_elem(0, 0);
 	_T_Matrices[joint_index]->assign_element(0, 0, deci_round(cos(acos(a_00) + theta_in_rads)));
-	int a_01 = _T_Matrices[joint_index]->get_elem(0, 1);
-	_T_Matrices[joint_index]->assign_element(0, 1, deci_round(-1*sin((-1*asin(a_01)) + theta_in_rads)));
+	double a_01 = _T_Matrices[joint_index]->get_elem(0, 1);
+	_T_Matrices[joint_index]->assign_element(0, 1, deci_round(-1.0*sin((asin(a_01*-1.0)) + theta_in_rads)));
 
-	int a_10 = _T_Matrices[joint_index]->get_elem(1, 0);
+	double a_10 = _T_Matrices[joint_index]->get_elem(1, 0);
 	_T_Matrices[joint_index]->assign_element(1, 0, deci_round(sin(asin(a_10) + theta_in_rads)));
-	int a_11 = _T_Matrices[joint_index]->get_elem(1, 1);
+	double a_11 = _T_Matrices[joint_index]->get_elem(1, 1);
 	_T_Matrices[joint_index]->assign_element(1, 1, deci_round(cos(acos(a_11) + theta_in_rads)));
 
 	for (int i = 0; i < base_to_n.size(); ++i) {
@@ -103,9 +104,9 @@ void PaintArm::translate(int joint_index, int x, int y) {
 		printf("ERROR :  PaintArm rotate :: Do not translate nonprismatic joints please\n");
 		return;
 	}
-	int old_x = _T_Matrices[joint_index]->get_elem(0, 3);
+	double old_x = _T_Matrices[joint_index]->get_elem(0, 3);
 	_T_Matrices[joint_index]->assign_element(0, 3, (x + old_x));
-	int old_y = _T_Matrices[joint_index]->get_elem(1, 3);
+	double old_y = _T_Matrices[joint_index]->get_elem(1, 3);
 	_T_Matrices[joint_index]->assign_element(1, 3, (y + old_y));
 
 	for (int i = 0; i < base_to_n.size(); ++i) {

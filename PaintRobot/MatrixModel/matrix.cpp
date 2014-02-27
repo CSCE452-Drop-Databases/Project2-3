@@ -24,6 +24,11 @@ Matrix::Matrix(int r, int c) {
 	for (int i = 0; i < row; ++i) {
 		matrix[i] =  new double[col];
 	}
+	for (int i = 0; i < row; ++i) {
+		for (int j = 0; j < col; ++j) {
+			matrix[i][j] = 0;
+		}
+	}
 	for (int i = 0; (i < row && i < col); ++i) {
 		matrix[i][i] = 1;
 	}
@@ -97,8 +102,8 @@ void Matrix::fill_bottom_row() {
 }
 
 
-double Matrix::get_elem(int row, int col) {
-	return matrix[row][col];
+double Matrix::get_elem(int r, int c) {
+	return matrix[r][c];
 }
 
 void Matrix::print(std::ostream& os) {
