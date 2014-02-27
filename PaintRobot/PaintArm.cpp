@@ -8,7 +8,8 @@
 
 */
 
-#include "paintarm.h"
+#include "stdafx.h"
+//#include "paintarm.h"
 
 double deci_round(double in) {
 	return round(in * 1000000)/1000000;

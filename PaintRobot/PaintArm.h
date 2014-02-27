@@ -9,8 +9,9 @@
 */
 
 #pragma once
-#include "global_const.h"
-#include "matrix.h"
+#include "stdafx.h"
+//#include "global_const.h"
+//#include "matrix.h"
 
 class PaintArm {
 	private:

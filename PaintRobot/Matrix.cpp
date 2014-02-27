@@ -8,7 +8,8 @@
 
 */
 
-#include "matrix.h"
+#include "stdafx.h"
+//#include "matrix.h"
 
 Matrix::Matrix(int r, int c) {
 	if (r <= 0 || c <= 0) {

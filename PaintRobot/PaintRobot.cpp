@@ -15,11 +15,13 @@ std::vector<Point> paint;
 
 Mouse mouse = { 0, 0, 0, 0, 0 };
 
-int tNum = 0;
+int axis1Num = 0;
+int axis2Num = 0;
+int axis3Num = 0;
 
 /*----------------------------------------------------------------------------------------
 *	\brief	This function draws a text string to the screen using glut bitmap fonts.
-*	\param	font	-	the font to use. it can be one of the following :
+*	\param	font	-	the font to use. it can be one of the following :s
 *
 *					GLUT_BITMAP_9_BY_15
 *					GLUT_BITMAP_8_BY_13
@@ -279,6 +281,13 @@ void drawButton(Button *b)
 	}
 }
 
+void resetPaintArm() {
+	paintArm = (*new PaintArm());
+	paintArm.translate(0, axis1Num * SLIDE_AMOUNT, 0);
+	paintArm.rotate(1, axis2Num * ROTATE_AMOUNT);
+	paintArm.rotate(2, axis3Num * ROTATE_AMOUNT);
+	glutPostRedisplay();
+}
 
 void gotoRobotArea() {
 	// translates to the top left of robot area
@@ -368,6 +377,7 @@ void drawRobotAreaContents() {
 	Matrix* paintArmAxis01 = paintArm.get_T_Matrix(0, 1);
 	Matrix* paintArmAxis02 = paintArm.get_T_Matrix(0, 2);
 	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
+	paintArmAxis03->print(std::cout);
 	
 	double paintArmAxis00X = paintArmAxis01->get_elem(0, 3);
 	double paintArmAxis00Y = paintArmAxis01->get_elem(1, 3);
@@ -382,7 +392,7 @@ void drawRobotAreaContents() {
 	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
 
 	glBegin(GL_LINE_STRIP);
-	glVertex2f(tNum, 0);
+	glVertex2f(axis1Num * SLIDE_AMOUNT, 0);
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glVertex2f(paintArmAxis01X, -paintArmAxis01Y);
 	glColor3f(0.0f, 0.0f, 1.0f);
@@ -484,10 +494,9 @@ void draw() {
 void axis1IncrementButtonCallback() {
 	// move axis1 1px right
 	printf("Axis 1 Increment Button Pressed!\n");
-	if (abs(tNum + SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
-		paintArm.translate(0, SLIDE_AMOUNT, 0);
-		tNum += SLIDE_AMOUNT;
-		glutPostRedisplay();
+	if (abs(axis1Num * SLIDE_AMOUNT + SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
+		axis1Num++;
+		resetPaintArm();
 	}
 	else {
 		std::cout << "ERROR: Cannot move base off of slide!" << std::endl;
@@ -498,10 +507,9 @@ void axis1IncrementButtonCallback() {
 void axis1DecrementButtonCallback() {
 	// move axis1 1px left
 	printf("Axis 1 Decrement Button Pressed!\n");
-	if (abs(tNum - SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
-		paintArm.translate(0, -SLIDE_AMOUNT, 0);
-		tNum -= SLIDE_AMOUNT;
-		glutPostRedisplay();
+	if (abs(axis1Num * SLIDE_AMOUNT - SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
+		axis1Num--;
+		resetPaintArm();
 	}
 	else {
 		std::cout << "ERROR: Cannot move base off of slide!" << std::endl;
@@ -511,29 +519,29 @@ void axis1DecrementButtonCallback() {
 void axis2IncrementButtonCallback() {
 	// rotate axis2 +1 degree
 	printf("Axis 2 Increment Button Pressed!\n");
-	paintArm.rotate(1, -ROTATE_AMOUNT);
-	glutPostRedisplay();
+	axis2Num--;
+	resetPaintArm();
 }
 
 void axis2DecrementButtonCallback() {
 	// rotate axis2 -1 degree
 	printf("Axis 2 Decrement Button Pressed!\n");
-	paintArm.rotate(1, ROTATE_AMOUNT);
-	glutPostRedisplay();
+	axis2Num++;
+	resetPaintArm();
 }
 
 void axis3IncrementButtonCallback() {
 	// rotate axis3 +1 degree
 	printf("Axis 3 Increment Button Pressed!\n");
-	paintArm.rotate(2, -ROTATE_AMOUNT);
-	glutPostRedisplay();
+	axis3Num--;
+	resetPaintArm();
 }
 
 void axis3DecrementButtonCallback() {
 	// rotate axis3 -1 degree
 	printf("Axis 3 Decrement Button Pressed!\n");
-	paintArm.rotate(2, ROTATE_AMOUNT);
-	glutPostRedisplay();
+	axis3Num++;
+	resetPaintArm();
 }
 
 void paintButtonCallback() {
@@ -544,7 +552,6 @@ void paintButtonCallback() {
 	double paintArmAxis03X = paintArmAxis03->get_elem(0, 3);
 	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
 	paint.push_back(Point(paintArmAxis03X, paintArmAxis03Y));
-	std::cout << "paint.size() = " << paint.size() << " | (" << paint[paint.size()-1].x << ", " << paint[paint.size()-1].y << ")" << std::endl;
 }
 
 
