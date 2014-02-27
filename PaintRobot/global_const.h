@@ -17,6 +17,7 @@ char* const cpAxis1Title = "Axis 1";
 char* const cpAxis2Title = "Axis 2";
 char* const cpAxis3Title = "Axis 3";
 char* const cpPaintBrushTitle = "Paint Brush";
+char* const cpClearTitle = "Clear and Reset";
 
 int const WINDOW_WIDTH = 800;
 int const WINDOW_HEIGHT = 600;

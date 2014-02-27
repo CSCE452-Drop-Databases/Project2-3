@@ -377,7 +377,6 @@ void drawRobotAreaContents() {
 	Matrix* paintArmAxis01 = paintArm.get_T_Matrix(0, 1);
 	Matrix* paintArmAxis02 = paintArm.get_T_Matrix(0, 2);
 	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
-	paintArmAxis03->print(std::cout);
 	
 	double paintArmAxis00X = paintArmAxis01->get_elem(0, 3);
 	double paintArmAxis00Y = paintArmAxis01->get_elem(1, 3);
@@ -393,14 +392,14 @@ void drawRobotAreaContents() {
 
 	glBegin(GL_LINE_STRIP);
 	glVertex2f(axis1Num * SLIDE_AMOUNT, 0);
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex2f(paintArmAxis01X, -paintArmAxis01Y);
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex2f(paintArmAxis02X, -paintArmAxis02Y);
-	glColor3f(0.0f, 1.0f, 1.0f);
-	glVertex2f(paintArmAxis03X, -paintArmAxis03Y);
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glVertex2f(paintArmAxis01X, -paintArmAxis01Y);
+		glColor3f(0.0f, 0.0f, 1.0f);
+		glVertex2f(paintArmAxis02X, -paintArmAxis02Y);
+		glColor3f(0.0f, 1.0f, 1.0f);
+		glVertex2f(paintArmAxis03X, -paintArmAxis03Y);
 	glEnd();
-
+	glColor3f(0.0f, 1.0f, 0.0f);
 	
 
 	glPopMatrix();
@@ -423,6 +422,8 @@ void drawControlPanelContents() {
 	int cpPaintBrushTitleX = (controlPanelWidth - glutBitmapLength(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)cpPaintBrushTitle)) / 2;
 	int cpPaintBrushTitleY = 0.57 * controlPanelHeight;
 
+	int cpClearTitleX = (controlPanelWidth - glutBitmapLength(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)cpClearTitle)) / 2;
+	int cpClearTitleY = 0.72 * controlPanelHeight;
 
 	glPushMatrix();
 	gotoControlPanel();
@@ -431,7 +432,7 @@ void drawControlPanelContents() {
 	font(GLUT_BITMAP_HELVETICA_12, cpAxis2Title, cpAxis2TitleX, cpAxis2TitleY);
 	font(GLUT_BITMAP_HELVETICA_12, cpAxis3Title, cpAxis3TitleX, cpAxis3TitleY);
 	font(GLUT_BITMAP_HELVETICA_12, cpPaintBrushTitle, cpPaintBrushTitleX, cpPaintBrushTitleY);
-
+	font(GLUT_BITMAP_HELVETICA_12, cpClearTitle, cpClearTitleX, cpClearTitleY);
 
 	for (Button b : controlPanelButtons) {
 		drawButton(&b);
@@ -554,6 +555,19 @@ void paintButtonCallback() {
 	paint.push_back(Point(paintArmAxis03X, paintArmAxis03Y));
 }
 
+void clearButtonCallback() {
+	paint.clear();
+	glutPostRedisplay();
+}
+
+void resetButtonCallback() {
+	paint.clear();
+	paintArm = (*new PaintArm());
+	axis1Num = 0;
+	axis2Num = 0;
+	axis3Num = 0;
+	glutPostRedisplay();
+}
 
 void initButtons() {
 
@@ -579,6 +593,10 @@ void initButtons() {
 	int paintButtonWidth = 0.9 * controlPanelWidth;
 	Button paintButton = { decrementButtonX, paintButtonY, paintButtonWidth, 25, 0, 0, "Paint", paintButtonCallback };
 
+	int clearButtonY = 0.75 * controlPanelHeight;
+	Button clearButton = { decrementButtonX, clearButtonY, buttonWidth, 25, 0, 0, "Clear Paint", clearButtonCallback };
+	Button resetButton = { incrementButtonX, clearButtonY, buttonWidth, 25, 0, 0, "Reset", resetButtonCallback };
+
 
 	controlPanelButtons.push_back(axis1DecrementButton);
 	controlPanelButtons.push_back(axis1IncrementButton);
@@ -590,6 +608,9 @@ void initButtons() {
 	controlPanelButtons.push_back(axis3IncrementButton);
 
 	controlPanelButtons.push_back(paintButton);
+
+	controlPanelButtons.push_back(clearButton);
+	controlPanelButtons.push_back(resetButton);
 }
 
 
@@ -709,6 +730,29 @@ void mousePassiveMotion(int x, int y)
 
 }
 
+void keyboard(unsigned char key, int x, int y)
+{
+	switch (key) {
+	case '1':
+		paintButtonCallback();
+		for (int i = 0; i < 360; ++i) {
+			axis2DecrementButtonCallback();
+			if (i % 5 == 0) {
+				axis3DecrementButtonCallback();
+			}
+			paintButtonCallback();
+		}
+		break;
+
+	case 'c':
+		clearButtonCallback();
+		break;
+	case 'r':
+		resetButtonCallback();
+		break;
+	}
+	glutPostRedisplay();
+}
 
 void initGraphics() {
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -727,6 +771,7 @@ int main(int argc, char **argv)
 	glutMouseFunc(mouseButtonPressed);
 	glutMotionFunc(mouseMotion);
 	glutPassiveMotionFunc(mousePassiveMotion);
+	glutKeyboardFunc(keyboard);
 
 	initGraphics();
 	initButtons();
