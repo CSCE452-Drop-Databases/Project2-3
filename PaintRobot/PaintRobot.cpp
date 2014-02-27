@@ -358,10 +358,6 @@ void drawRobotAreaContents() {
 	// draw the robot
 	glPushMatrix();
 	gotoRobotArea();
-	glBegin(GL_LINES);
-		glVertex2f(slidePosX, slidePosY);
-		glVertex2f(slidePosX + SLIDE_LENGTH, slidePosY);
-	glEnd();
 
 	glTranslatef(slidePosX + SLIDE_LENGTH / 2, slidePosY, 0.0f); // Translate to middle of bar (robot origin)
 
@@ -400,7 +396,15 @@ void drawRobotAreaContents() {
 		glVertex2f(paintArmAxis03X, -paintArmAxis03Y);
 	glEnd();
 	glColor3f(0.0f, 1.0f, 0.0f);
-	
+
+	glPopMatrix();
+
+	glPushMatrix();
+	gotoRobotArea();
+	glBegin(GL_LINES);
+		glVertex2f(slidePosX, slidePosY);
+		glVertex2f(slidePosX + SLIDE_LENGTH, slidePosY);
+	glEnd();
 
 	glPopMatrix();
 }
@@ -479,10 +483,10 @@ void drawOverlay() {
 
 void draw() {
 	glClear(GL_COLOR_BUFFER_BIT);
-
-	drawOverlay();
+	
 	drawRobotAreaContents();
 	drawControlPanelContents();
+	drawOverlay();
 
 	glFlush();
 }
@@ -739,6 +743,9 @@ void keyboard(unsigned char key, int x, int y)
 			axis2DecrementButtonCallback();
 			if (i % 5 == 0) {
 				axis3DecrementButtonCallback();
+			}
+			if (i % 10 == 0) {
+				//axis1IncrementButtonCallback();
 			}
 			paintButtonCallback();
 		}

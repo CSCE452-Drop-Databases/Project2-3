@@ -19,8 +19,8 @@ char* const cpAxis3Title = "Axis 3";
 char* const cpPaintBrushTitle = "Paint Brush";
 char* const cpClearTitle = "Clear and Reset";
 
-int const WINDOW_WIDTH = 800;
-int const WINDOW_HEIGHT = 600;
+int const WINDOW_WIDTH = 1000;
+int const WINDOW_HEIGHT = 750;
 
 // IMPORTANT NOTE: 3 * GUI_MARGIN_PERCENT + GUI_ROBOT_AREA_WIDTH_PERCENT + GUI_CONTROL_PANEL_WIDTH_PERCENT == 1.0
 float const GUI_MARGIN_PERCENT = 0.025;
