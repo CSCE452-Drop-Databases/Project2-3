@@ -8,10 +8,23 @@ struct Point {
 };
 typedef struct Point Point;
 
+struct Brush {
+	float r;
+	float g;
+	float b;
+};
+typedef struct Brush Brush;
+
+struct PaintCircle {
+	Point p;
+	Brush b;
+};
+
 PaintArm paintArm;
+Brush paintBrush = { 1.0f, 1.0f, 1.0f };
 
 std::vector<Button> controlPanelButtons;
-std::vector<Point> paint;
+std::vector<PaintCircle> paint;
 
 Mouse mouse = { 0, 0, 0, 0, 0 };
 
@@ -372,6 +385,22 @@ void ellipseMidpoint(float xc, float yc, float rx, float ry)
 	}
 }
 
+Point axisMidpoint(int axis1, int axis2) {
+	Matrix* paintArmAxis01 = paintArm.get_T_Matrix(0, axis1);
+	Matrix* paintArmAxis02 = paintArm.get_T_Matrix(0, axis2);
+
+	double paintArmAxis01X = paintArmAxis01->get_elem(0, 3);
+	double paintArmAxis01Y = paintArmAxis01->get_elem(1, 3);
+
+	double paintArmAxis02X = paintArmAxis02->get_elem(0, 3);
+	double paintArmAxis02Y = paintArmAxis02->get_elem(1, 3);
+
+	double midpointX = (paintArmAxis01X + paintArmAxis02X) / 2;
+	double midpointY = (paintArmAxis01Y + paintArmAxis02Y) / 2;
+
+	return Point(midpointX, midpointY);
+}
+
 void drawRobotAreaContents() {
 	// draw the robot
 	glPushMatrix();
@@ -379,10 +408,10 @@ void drawRobotAreaContents() {
 
 	glTranslatef(slidePosX + SLIDE_LENGTH / 2, slidePosY, 0.0f); // Translate to middle of bar (robot origin)
 
-	for (Point p : paint) {
+	for (PaintCircle p : paint) {
 		glBegin(GL_LINES);
-		glColor3f(1.0f, 1.0f, 1.0f);
-		ellipseMidpoint(p.x, -p.y, 5, 5);
+		glColor3f(p.b.r, p.b.g, p.b.b);
+		ellipseMidpoint(p.p.x, -p.p.y, 5, 5);
 		glEnd();
 	}
 	
@@ -403,15 +432,33 @@ void drawRobotAreaContents() {
 	double paintArmAxis03X = paintArmAxis03->get_elem(0, 3);
 	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
 
-	glBegin(GL_LINE_STRIP);
-	glVertex2f(axis1Num * SLIDE_AMOUNT, 0);
-		glColor3f(1.0f, 0.0f, 0.0f);
-		glVertex2f(paintArmAxis01X, -paintArmAxis01Y);
-		glColor3f(0.0f, 0.0f, 1.0f);
-		glVertex2f(paintArmAxis02X, -paintArmAxis02Y);
-		glColor3f(0.0f, 1.0f, 1.0f);
-		glVertex2f(paintArmAxis03X, -paintArmAxis03Y);
+	Point midpoint01 = axisMidpoint(0, 1);
+	Point midpoint12 = axisMidpoint(1, 2);
+	Point midpoint23 = axisMidpoint(2, 3);
+
+	glPushMatrix();
+	glTranslatef(midpoint23.x, -midpoint23.y, 0);
+	glRotatef((-axis3Num * ROTATE_AMOUNT) + (-axis2Num * ROTATE_AMOUNT), 0.0f, 0.0f, 1.0f);
+	glBegin(GL_TRIANGLE_STRIP);
+	glColor3f(0.0f, 0.0f, 107.0f / 255.0f);
+	ellipseMidpoint(0, 0, LINK_WIDTH, LINK_LENGTH_3 / 2);
 	glEnd();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(midpoint12.x, -midpoint12.y, 0);
+	glRotatef(-axis2Num * ROTATE_AMOUNT, 0.0f, 0.0f, 1.0f);
+	glBegin(GL_TRIANGLE_STRIP);
+	glColor3f(0.0f, 107.0f / 255.0f, 0.0f);
+	ellipseMidpoint(0, 0, LINK_WIDTH, LINK_LENGTH_2 / 2);
+	glEnd();
+	glPopMatrix();
+
+	glBegin(GL_TRIANGLE_STRIP);
+	glColor3f(107.0f / 255.0f, 0.0f, 0.0f);
+		ellipseMidpoint(midpoint01.x, -midpoint01.y, LINK_WIDTH, LINK_LENGTH_1 / 2);
+	glEnd();
+	
 	glColor3f(0.0f, 1.0f, 0.0f);
 
 	glPopMatrix();
@@ -446,6 +493,9 @@ void drawControlPanelContents() {
 	int cpClearTitleX = (controlPanelWidth - glutBitmapLength(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)cpClearTitle)) / 2;
 	int cpClearTitleY = 0.72 * controlPanelHeight;
 
+	int cpColorTitleX = (controlPanelWidth - glutBitmapLength(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)cpColorTitle)) / 2;
+	int cpColorTitleY = 0.87 * controlPanelHeight;
+
 	glPushMatrix();
 	gotoControlPanel();
 	font(GLUT_BITMAP_HELVETICA_18, cpTitle, cpTitleX, cpTitleY);
@@ -454,6 +504,7 @@ void drawControlPanelContents() {
 	font(GLUT_BITMAP_HELVETICA_12, cpAxis3Title, cpAxis3TitleX, cpAxis3TitleY);
 	font(GLUT_BITMAP_HELVETICA_12, cpPaintBrushTitle, cpPaintBrushTitleX, cpPaintBrushTitleY);
 	font(GLUT_BITMAP_HELVETICA_12, cpClearTitle, cpClearTitleX, cpClearTitleY);
+	font(GLUT_BITMAP_HELVETICA_12, cpColorTitle, cpColorTitleX, cpColorTitleY);
 
 	for (Button b : controlPanelButtons) {
 		drawButton(&b);
@@ -573,7 +624,8 @@ void paintButtonCallback() {
 	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
 	double paintArmAxis03X = paintArmAxis03->get_elem(0, 3);
 	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
-	paint.push_back(Point(paintArmAxis03X, paintArmAxis03Y));
+	PaintCircle circle = { Point(paintArmAxis03X, paintArmAxis03Y), {paintBrush.r, paintBrush.g, paintBrush.b} };
+	paint.push_back(circle);
 }
 
 void clearButtonCallback() {
@@ -588,6 +640,22 @@ void resetButtonCallback() {
 	axis2Num = 0;
 	axis3Num = 0;
 	glutPostRedisplay();
+}
+
+void colorRedButtonCallback() {
+	paintBrush = {1.0f, 0.0f, 0.0f};
+}
+
+void colorGreenButtonCallback() {
+	paintBrush = { 0.0f, 1.0f, 0.0f };
+}
+
+void colorBlueButtonCallback() {
+	paintBrush = { 0.0f, 0.0f, 1.0f };
+}
+
+void colorWhiteButtonCallback() {
+	paintBrush = { 1.0f, 1.0f, 1.0f };
 }
 
 void initButtons() {
@@ -618,6 +686,15 @@ void initButtons() {
 	Button clearButton = { decrementButtonX, clearButtonY, buttonWidth, 25, 0, 0, "Clear Paint", clearButtonCallback };
 	Button resetButton = { incrementButtonX, clearButtonY, buttonWidth, 25, 0, 0, "Reset", resetButtonCallback };
 
+	int colorRow1ButtonY = 0.90 * controlPanelHeight;
+	Button colorWhiteButton = { decrementButtonX, colorRow1ButtonY, buttonWidth, 25, 0, 0, "White", colorWhiteButtonCallback };
+	Button colorRedButton = { incrementButtonX, colorRow1ButtonY, buttonWidth, 25, 0, 0, "Red", colorRedButtonCallback };
+
+	int colorRow2ButtonY = 0.90 * controlPanelHeight + 30;
+	Button colorBlueButton = { decrementButtonX, colorRow2ButtonY, buttonWidth, 25, 0, 0, "Blue", colorBlueButtonCallback };
+	Button colorGreenButton = { incrementButtonX, colorRow2ButtonY, buttonWidth, 25, 0, 0, "Green", colorGreenButtonCallback };
+
+
 
 	controlPanelButtons.push_back(axis1DecrementButton);
 	controlPanelButtons.push_back(axis1IncrementButton);
@@ -632,6 +709,11 @@ void initButtons() {
 
 	controlPanelButtons.push_back(clearButton);
 	controlPanelButtons.push_back(resetButton);
+
+	controlPanelButtons.push_back(colorWhiteButton);
+	controlPanelButtons.push_back(colorRedButton);
+	controlPanelButtons.push_back(colorBlueButton);
+	controlPanelButtons.push_back(colorGreenButton);
 }
 
 
@@ -761,13 +843,60 @@ void keyboard(unsigned char key, int x, int y)
 			if (i % 5 == 0) {
 				axis3DecrementButtonCallback();
 			}
-			if (i % 10 == 0) {
-				//axis1IncrementButtonCallback();
+			paintButtonCallback();
+		}
+		break;
+	case '2':
+		paintButtonCallback();
+		for (int i = 0; i < 90; ++i) {
+			axis3IncrementButtonCallback();
+			if (i % 9 == 0) {
+				axis2DecrementButtonCallback();
+			}
+			if (i % 3 == 0) {
+				axis2IncrementButtonCallback();
 			}
 			paintButtonCallback();
 		}
 		break;
-
+	case '3':
+		paintButtonCallback();
+		for (int i = 0; i < 45; ++i) {
+			axis3IncrementButtonCallback();
+			if (i % 9 == 0) {
+				axis1IncrementButtonCallback();
+			}
+			if (i % 6 == 0) {
+				axis1DecrementButtonCallback();
+			}
+			if (i % 5 == 0) {
+				axis2DecrementButtonCallback();
+			}
+			if (i % 3 == 0) {
+				axis2IncrementButtonCallback();
+			}
+			paintButtonCallback();
+		}
+		break;
+	case '4':
+		paintButtonCallback();
+		for (int i = 0; i < 45; ++i) {
+			axis3IncrementButtonCallback();
+			if (i % 9 == 0) {
+				axis1DecrementButtonCallback();
+			}
+			if (i % 6 == 0) {
+				axis1IncrementButtonCallback();
+			}
+			if (i % 5 == 0) {
+				axis2DecrementButtonCallback();
+			}
+			if (i % 3 == 0) {
+				axis2IncrementButtonCallback();
+			}
+			paintButtonCallback();
+		}
+		break;
 	case 'c':
 		clearButtonCallback();
 		break;

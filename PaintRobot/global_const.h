@@ -18,6 +18,7 @@ char* const cpAxis2Title = "Axis 2";
 char* const cpAxis3Title = "Axis 3";
 char* const cpPaintBrushTitle = "Paint Brush";
 char* const cpClearTitle = "Clear and Reset";
+char* const cpColorTitle = "Colors";
 
 int const WINDOW_WIDTH = 1000;
 int const WINDOW_HEIGHT = 750;
@@ -55,3 +56,5 @@ int const LINK_LENGTH_3 = 75;
 
 int const ROTATE_AMOUNT = 1;
 int const SLIDE_AMOUNT = 1;
+
+int const LINK_WIDTH = 15;
