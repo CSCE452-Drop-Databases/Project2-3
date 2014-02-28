@@ -57,4 +57,4 @@ int const LINK_LENGTH_3 = 75;
 int const ROTATE_AMOUNT = 1;
 int const SLIDE_AMOUNT = 1;
 
-int const LINK_WIDTH = 15;
+int const LINK_WIDTH = 20;

@@ -471,7 +471,7 @@ void drawRobotAreaContents() {
 	glRotatef((-axis3Num * ROTATE_AMOUNT) + (-axis2Num * ROTATE_AMOUNT), 0.0f, 0.0f, 1.0f);
 	glBegin(GL_TRIANGLE_STRIP);
 	glColor3f(0.0f, 0.0f, 107.0f / 255.0f);
-	ellipseMidpoint(0, 0, LINK_WIDTH, LINK_LENGTH_3 / 2);
+	ellipseMidpoint(0, 0, LINK_WIDTH / 2, LINK_LENGTH_3 / 2);
 	glEnd();
 	glPopMatrix();
 
@@ -480,13 +480,13 @@ void drawRobotAreaContents() {
 	glRotatef(-axis2Num * ROTATE_AMOUNT, 0.0f, 0.0f, 1.0f);
 	glBegin(GL_TRIANGLE_STRIP);
 	glColor3f(0.0f, 107.0f / 255.0f, 0.0f);
-	ellipseMidpoint(0, 0, LINK_WIDTH, LINK_LENGTH_2 / 2);
+	ellipseMidpoint(0, 0, LINK_WIDTH / 2, LINK_LENGTH_2 / 2);
 	glEnd();
 	glPopMatrix();
 
 	glBegin(GL_TRIANGLE_STRIP);
 	glColor3f(107.0f / 255.0f, 0.0f, 0.0f);
-		ellipseMidpoint(midpoint01.x, -midpoint01.y, LINK_WIDTH, LINK_LENGTH_1 / 2);
+		ellipseMidpoint(midpoint01.x, -midpoint01.y, LINK_WIDTH / 2, LINK_LENGTH_1 / 2);
 	glEnd();
 	
 	glColor3f(0.0f, 1.0f, 0.0f);
