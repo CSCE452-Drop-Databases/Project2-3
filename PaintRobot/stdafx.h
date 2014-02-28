@@ -19,6 +19,7 @@
 #include "PaintArm.h"
 
 #ifdef _WIN32
+#include "windows.h"
 #include "targetver.h"
 #include <gl/glut.h>
 #endif

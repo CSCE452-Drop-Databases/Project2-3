@@ -8,20 +8,21 @@ struct Point {
 };
 typedef struct Point Point;
 
-struct Brush {
+struct Color {
 	float r;
 	float g;
 	float b;
 };
-typedef struct Brush Brush;
+typedef struct Color;
 
 struct PaintCircle {
 	Point p;
-	Brush b;
+	Color c;
 };
 
 PaintArm paintArm;
-Brush paintBrush = { 1.0f, 1.0f, 1.0f };
+Color paintBrushColor = { 1.0f, 1.0f, 1.0f };
+int paintButtonMode = 0;
 
 std::vector<Button> controlPanelButtons;
 std::vector<PaintCircle> paint;
@@ -110,14 +111,25 @@ void ButtonRelease(Button *b, int x, int y)
 			*	Then if a callback function has been set, call it.
 			*/
 			if (b->callbackFunction) {
-				b->callbackFunction();
+				if (b->cbOnRelease) {
+					b->callbackFunction();
+				}
+				else {
+					glutIdleFunc(NULL);
+				}
 			}
+			if (b->cbOnRelease && b->type == Button::TOGGLE) {
+				b->mode = !b->mode;
+			}
+
 		}
 
-		/*
-		*	Set state back to zero.
-		*/
-		b->state = 0;
+		if (b->type == Button::TOGGLE && b->mode) {
+			b->state = 1;
+		}
+		else {
+			b->state = 0;
+		}
 	}
 }
 
@@ -138,6 +150,12 @@ void ButtonPress(Button *b, int x, int y)
 		if (ButtonClickTest(b, x, y))
 		{
 			b->state = 1;
+			if (!b->cbOnRelease) {
+				b->mode = !b->mode;
+				if ((b->type == Button::TOGGLE && b->mode && b->callbackFunction) || (b->type == Button::PRESS && b->callbackFunction)) {
+					glutIdleFunc(b->callbackFunction);
+				}
+			}
 		}
 	}
 }
@@ -410,7 +428,7 @@ void drawRobotAreaContents() {
 
 	for (PaintCircle p : paint) {
 		glBegin(GL_LINES);
-		glColor3f(p.b.r, p.b.g, p.b.b);
+		glColor3f(p.c.r, p.c.g, p.c.b);
 		ellipseMidpoint(p.p.x, -p.p.y, 5, 5);
 		glEnd();
 	}
@@ -543,12 +561,6 @@ void drawOverlay() {
 	glPopMatrix();
 }
 
-
-
-
-
-
-
 void draw() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	
@@ -558,8 +570,13 @@ void draw() {
 
 	glFlush();
 }
-
-
+void paintCircle() {
+	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
+	double paintArmAxis03X = paintArmAxis03->get_elem(0, 3);
+	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
+	PaintCircle circle = { Point(paintArmAxis03X, paintArmAxis03Y), { paintBrushColor.r, paintBrushColor.g, paintBrushColor.b } };
+	paint.push_back(circle);
+}
 
 /*
  * Button Callbacks
@@ -570,6 +587,8 @@ void axis1IncrementButtonCallback() {
 	if (abs(axis1Num * SLIDE_AMOUNT + SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
 		axis1Num++;
 		resetPaintArm();
+		if (controlPanelButtons[6].mode) paintCircle();
+		Sleep(75);
 	}
 	else {
 		std::cout << "ERROR: Cannot move base off of slide!" << std::endl;
@@ -583,6 +602,8 @@ void axis1DecrementButtonCallback() {
 	if (abs(axis1Num * SLIDE_AMOUNT - SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
 		axis1Num--;
 		resetPaintArm();
+		if (controlPanelButtons[6].mode) paintCircle();
+		Sleep(75);
 	}
 	else {
 		std::cout << "ERROR: Cannot move base off of slide!" << std::endl;
@@ -594,6 +615,8 @@ void axis2IncrementButtonCallback() {
 	printf("Axis 2 Increment Button Pressed!\n");
 	axis2Num--;
 	resetPaintArm();
+	if (controlPanelButtons[6].mode) paintCircle();
+	Sleep(75);
 }
 
 void axis2DecrementButtonCallback() {
@@ -601,6 +624,8 @@ void axis2DecrementButtonCallback() {
 	printf("Axis 2 Decrement Button Pressed!\n");
 	axis2Num++;
 	resetPaintArm();
+	if (controlPanelButtons[6].mode) paintCircle();
+	Sleep(75);
 }
 
 void axis3IncrementButtonCallback() {
@@ -608,6 +633,8 @@ void axis3IncrementButtonCallback() {
 	printf("Axis 3 Increment Button Pressed!\n");
 	axis3Num--;
 	resetPaintArm();
+	if (controlPanelButtons[6].mode) paintCircle();
+	Sleep(75);
 }
 
 void axis3DecrementButtonCallback() {
@@ -615,47 +642,98 @@ void axis3DecrementButtonCallback() {
 	printf("Axis 3 Decrement Button Pressed!\n");
 	axis3Num++;
 	resetPaintArm();
+	if (controlPanelButtons[6].mode) paintCircle();
+	Sleep(75);
 }
 
 void paintButtonCallback() {
-	// add a new circle to paint
+	// toggle painting mode
 	printf("Paint Button Pressed!\n");
-	// TODO: Get paint brush x,y coordinates
-	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
-	double paintArmAxis03X = paintArmAxis03->get_elem(0, 3);
-	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
-	PaintCircle circle = { Point(paintArmAxis03X, paintArmAxis03Y), {paintBrush.r, paintBrush.g, paintBrush.b} };
-	paint.push_back(circle);
+	//controlPanelButtons[6].mode = !controlPanelButtons[6].mode;
+	//controlPanelButtons[6].state = !controlPanelButtons[6].state;
+	paintButtonMode = !paintButtonMode;
 }
 
 void clearButtonCallback() {
+	printf("Clear Button Pressed!\n");
 	paint.clear();
 	glutPostRedisplay();
 }
 
 void resetButtonCallback() {
+	printf("Reset Button Pressed!\n");
 	paint.clear();
 	paintArm = (*new PaintArm());
 	axis1Num = 0;
 	axis2Num = 0;
 	axis3Num = 0;
+	controlPanelButtons[6].mode = 0;
+	controlPanelButtons[6].state = 0;
+	glutPostRedisplay();
+}
+
+void colorWhiteButtonCallback() {
+	printf("White Button Pressed!\n");
+	controlPanelButtons[9].mode = 0;
+	controlPanelButtons[9].state = 0;
+	paintBrushColor = { 1.0f, 1.0f, 1.0f };
+	controlPanelButtons[10].mode = 0;
+	controlPanelButtons[11].mode = 0;
+	controlPanelButtons[12].mode = 0;
+
+	controlPanelButtons[10].state = 0;
+	controlPanelButtons[11].state = 0;
+	controlPanelButtons[12].state = 0;
+
 	glutPostRedisplay();
 }
 
 void colorRedButtonCallback() {
-	paintBrush = {1.0f, 0.0f, 0.0f};
-}
+	printf("Red Button Pressed!\n");
+	controlPanelButtons[10].mode = 0;
+	controlPanelButtons[10].state = 0;
+	paintBrushColor = { 1.0f, 0.0f, 0.0f };
+	controlPanelButtons[9].mode = 0;
+	controlPanelButtons[11].mode = 0;
+	controlPanelButtons[12].mode = 0;
 
-void colorGreenButtonCallback() {
-	paintBrush = { 0.0f, 1.0f, 0.0f };
+	controlPanelButtons[9].state = 0;
+	controlPanelButtons[11].state = 0;
+	controlPanelButtons[12].state = 0;
+
+	glutPostRedisplay();
 }
 
 void colorBlueButtonCallback() {
-	paintBrush = { 0.0f, 0.0f, 1.0f };
+	printf("Blue Button Pressed!\n");
+	controlPanelButtons[11].mode = 0;
+	controlPanelButtons[11].state = 0;
+	paintBrushColor = { 0.0f, 0.0f, 1.0f };
+	controlPanelButtons[9].mode = 0;
+	controlPanelButtons[10].mode = 0;
+	controlPanelButtons[12].mode = 0;
+
+	controlPanelButtons[9].state = 0;
+	controlPanelButtons[10].state = 0;
+	controlPanelButtons[12].state = 0;
+
+	glutPostRedisplay();
 }
 
-void colorWhiteButtonCallback() {
-	paintBrush = { 1.0f, 1.0f, 1.0f };
+void colorGreenButtonCallback() {
+	printf("Green Button Pressed!\n");
+	controlPanelButtons[12].mode = 0;
+	controlPanelButtons[12].state = 0;
+	paintBrushColor = { 0.0f, 1.0f, 0.0f };
+	controlPanelButtons[9].mode = 0;
+	controlPanelButtons[10].mode = 0;
+	controlPanelButtons[11].mode = 0;
+
+	controlPanelButtons[9].state = 0;
+	controlPanelButtons[10].state = 0;
+	controlPanelButtons[11].state = 0;
+
+	glutPostRedisplay();
 }
 
 void initButtons() {
@@ -667,53 +745,53 @@ void initButtons() {
 	int incrementButtonX = (controlPanelWidth / 2) + 0.025 * controlPanelWidth;
 
 	int axis1ButtonY = 0.15 * controlPanelHeight;
-	Button axis1DecrementButton = { decrementButtonX, axis1ButtonY, buttonWidth, 25, 0, 0, "-1", axis1DecrementButtonCallback };
-	Button axis1IncrementButton = { incrementButtonX, axis1ButtonY, buttonWidth, 25, 0, 0, "+1", axis1IncrementButtonCallback };
+	Button axis1DecrementButton = { decrementButtonX, axis1ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "-1", axis1DecrementButtonCallback, 0 };
+	Button axis1IncrementButton = { incrementButtonX, axis1ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "+1", axis1IncrementButtonCallback, 0 };
 
 	int axis2ButtonY = 0.30 * controlPanelHeight;
-	Button axis2DecrementButton = { decrementButtonX, axis2ButtonY, buttonWidth, 25, 0, 0, "-1", axis2DecrementButtonCallback };
-	Button axis2IncrementButton = { incrementButtonX, axis2ButtonY, buttonWidth, 25, 0, 0, "+1", axis2IncrementButtonCallback };
+	Button axis2DecrementButton = { decrementButtonX, axis2ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "-1", axis2DecrementButtonCallback, 0 };
+	Button axis2IncrementButton = { incrementButtonX, axis2ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "+1", axis2IncrementButtonCallback, 0 };
 	
 	int axis3ButtonY = 0.45 * controlPanelHeight;
-	Button axis3DecrementButton = { decrementButtonX, axis3ButtonY, buttonWidth, 25, 0, 0, "-1", axis3DecrementButtonCallback };
-	Button axis3IncrementButton = { incrementButtonX, axis3ButtonY, buttonWidth, 25, 0, 0, "+1", axis3IncrementButtonCallback };
+	Button axis3DecrementButton = { decrementButtonX, axis3ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "-1", axis3DecrementButtonCallback, 0 };
+	Button axis3IncrementButton = { incrementButtonX, axis3ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "+1", axis3IncrementButtonCallback, 0 };
 
 	int paintButtonY = 0.60 * controlPanelHeight;
 	int paintButtonWidth = 0.9 * controlPanelWidth;
-	Button paintButton = { decrementButtonX, paintButtonY, paintButtonWidth, 25, 0, 0, "Paint", paintButtonCallback };
+	Button paintButton = { decrementButtonX, paintButtonY, paintButtonWidth, 25, Button::TOGGLE, 0, 0, 0, "Paint", paintButtonCallback, 1 };
 
 	int clearButtonY = 0.75 * controlPanelHeight;
-	Button clearButton = { decrementButtonX, clearButtonY, buttonWidth, 25, 0, 0, "Clear Paint", clearButtonCallback };
-	Button resetButton = { incrementButtonX, clearButtonY, buttonWidth, 25, 0, 0, "Reset", resetButtonCallback };
+	Button clearButton = { decrementButtonX, clearButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "Clear Paint", clearButtonCallback, 1 };
+	Button resetButton = { incrementButtonX, clearButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "Reset", resetButtonCallback, 1 };
 
 	int colorRow1ButtonY = 0.90 * controlPanelHeight;
-	Button colorWhiteButton = { decrementButtonX, colorRow1ButtonY, buttonWidth, 25, 0, 0, "White", colorWhiteButtonCallback };
-	Button colorRedButton = { incrementButtonX, colorRow1ButtonY, buttonWidth, 25, 0, 0, "Red", colorRedButtonCallback };
+	Button colorWhiteButton = { decrementButtonX, colorRow1ButtonY, buttonWidth, 25, Button::TOGGLE, 1, 1, 0, "White", colorWhiteButtonCallback, 1 };
+	Button colorRedButton = { incrementButtonX, colorRow1ButtonY, buttonWidth, 25, Button::TOGGLE, 0, 0, 0, "Red", colorRedButtonCallback, 1 };
 
 	int colorRow2ButtonY = 0.90 * controlPanelHeight + 30;
-	Button colorBlueButton = { decrementButtonX, colorRow2ButtonY, buttonWidth, 25, 0, 0, "Blue", colorBlueButtonCallback };
-	Button colorGreenButton = { incrementButtonX, colorRow2ButtonY, buttonWidth, 25, 0, 0, "Green", colorGreenButtonCallback };
+	Button colorBlueButton = { decrementButtonX, colorRow2ButtonY, buttonWidth, 25, Button::TOGGLE, 0, 0, 0, "Blue", colorBlueButtonCallback, 1 };
+	Button colorGreenButton = { incrementButtonX, colorRow2ButtonY, buttonWidth, 25, Button::TOGGLE, 0, 0, 0, "Green", colorGreenButtonCallback, 1 };
 
 
 
-	controlPanelButtons.push_back(axis1DecrementButton);
-	controlPanelButtons.push_back(axis1IncrementButton);
+	controlPanelButtons.push_back(axis1DecrementButton); // 0
+	controlPanelButtons.push_back(axis1IncrementButton); // 1
 
-	controlPanelButtons.push_back(axis2DecrementButton);
-	controlPanelButtons.push_back(axis2IncrementButton);
+	controlPanelButtons.push_back(axis2DecrementButton); // 2
+	controlPanelButtons.push_back(axis2IncrementButton); // 3
 
-	controlPanelButtons.push_back(axis3DecrementButton);
-	controlPanelButtons.push_back(axis3IncrementButton);
+	controlPanelButtons.push_back(axis3DecrementButton); // 4
+	controlPanelButtons.push_back(axis3IncrementButton); // 5
 
-	controlPanelButtons.push_back(paintButton);
+	controlPanelButtons.push_back(paintButton); // 6
 
-	controlPanelButtons.push_back(clearButton);
-	controlPanelButtons.push_back(resetButton);
+	controlPanelButtons.push_back(clearButton); // 7
+	controlPanelButtons.push_back(resetButton); // 8
 
-	controlPanelButtons.push_back(colorWhiteButton);
-	controlPanelButtons.push_back(colorRedButton);
-	controlPanelButtons.push_back(colorBlueButton);
-	controlPanelButtons.push_back(colorGreenButton);
+	controlPanelButtons.push_back(colorWhiteButton); // 9
+	controlPanelButtons.push_back(colorRedButton); // 10
+	controlPanelButtons.push_back(colorBlueButton); // 11
+	controlPanelButtons.push_back(colorGreenButton); // 12
 }
 
 
