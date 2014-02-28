@@ -915,17 +915,24 @@ void keyboard(unsigned char key, int x, int y)
 {
 	switch (key) {
 	case '1':
-		paintButtonCallback();
+		controlPanelButtons[6].mode = 1;
+		controlPanelButtons[6].state = 1;
+		paintButtonMode = 1;
 		for (int i = 0; i < 360; ++i) {
 			axis2DecrementButtonCallback();
 			if (i % 5 == 0) {
 				axis3DecrementButtonCallback();
 			}
-			paintButtonCallback();
+			draw();
 		}
+		controlPanelButtons[6].mode = 0;
+		controlPanelButtons[6].state = 0;
+		paintButtonMode = 0;
 		break;
 	case '2':
-		paintButtonCallback();
+		controlPanelButtons[6].mode = 1;
+		controlPanelButtons[6].state = 1;
+		paintButtonMode = 1;
 		for (int i = 0; i < 90; ++i) {
 			axis3IncrementButtonCallback();
 			if (i % 9 == 0) {
@@ -934,11 +941,16 @@ void keyboard(unsigned char key, int x, int y)
 			if (i % 3 == 0) {
 				axis2IncrementButtonCallback();
 			}
-			paintButtonCallback();
+			draw();
 		}
+		controlPanelButtons[6].mode = 0;
+		controlPanelButtons[6].state = 0;
+		paintButtonMode = 0;
 		break;
 	case '3':
-		paintButtonCallback();
+		controlPanelButtons[6].mode = 1;
+		controlPanelButtons[6].state = 1;
+		paintButtonMode = 1;
 		for (int i = 0; i < 45; ++i) {
 			axis3IncrementButtonCallback();
 			if (i % 9 == 0) {
@@ -953,11 +965,16 @@ void keyboard(unsigned char key, int x, int y)
 			if (i % 3 == 0) {
 				axis2IncrementButtonCallback();
 			}
-			paintButtonCallback();
+			draw();
 		}
+		controlPanelButtons[6].mode = 0;
+		controlPanelButtons[6].state = 0;
+		paintButtonMode = 0;
 		break;
 	case '4':
-		paintButtonCallback();
+		controlPanelButtons[6].mode = 1;
+		controlPanelButtons[6].state = 1;
+		paintButtonMode = 1;
 		for (int i = 0; i < 45; ++i) {
 			axis3IncrementButtonCallback();
 			if (i % 9 == 0) {
@@ -972,8 +989,11 @@ void keyboard(unsigned char key, int x, int y)
 			if (i % 3 == 0) {
 				axis2IncrementButtonCallback();
 			}
-			paintButtonCallback();
+			draw();
 		}
+		controlPanelButtons[6].mode = 0;
+		controlPanelButtons[6].state = 0;
+		paintButtonMode = 0;
 		break;
 	case 'c':
 		clearButtonCallback();
