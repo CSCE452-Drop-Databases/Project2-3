@@ -34,9 +34,11 @@ int axis1Num = 0;
 int axis2Num = 0;
 int axis3Num = 0;
 
+int instantPaint = 0;
+
 void paintRobotSleep(int ms) {
     // Sleep(75); // Comment if on Linux
-    sleep(((float)ms)/100.0); //Comment if on Windows
+    //sleep(((float)ms)/100.0); //Comment if on Windows
 }
 
 /*----------------------------------------------------------------------------------------
@@ -935,7 +937,7 @@ void keyboard(unsigned char key, int x, int y)
 			if (i % 5 == 0) {
 				axis3DecrementButtonCallback();
 			}
-			draw();
+			if (!instantPaint) draw();
 		}
 		controlPanelButtons[6].mode = 0;
 		controlPanelButtons[6].state = 0;
@@ -953,7 +955,7 @@ void keyboard(unsigned char key, int x, int y)
 			if (i % 3 == 0) {
 				axis2IncrementButtonCallback();
 			}
-			draw();
+			if (!instantPaint) draw();
 		}
 		controlPanelButtons[6].mode = 0;
 		controlPanelButtons[6].state = 0;
@@ -977,7 +979,7 @@ void keyboard(unsigned char key, int x, int y)
 			if (i % 3 == 0) {
 				axis2IncrementButtonCallback();
 			}
-			draw();
+			if (!instantPaint) draw();
 		}
 		controlPanelButtons[6].mode = 0;
 		controlPanelButtons[6].state = 0;
@@ -1001,7 +1003,7 @@ void keyboard(unsigned char key, int x, int y)
 			if (i % 3 == 0) {
 				axis2IncrementButtonCallback();
 			}
-			draw();
+			if (!instantPaint) draw();
 		}
 		controlPanelButtons[6].mode = 0;
 		controlPanelButtons[6].state = 0;
@@ -1012,6 +1014,27 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case 'r':
 		resetButtonCallback();
+		break;
+	case 'q':
+		axis1DecrementButtonCallback();
+		break;
+	case 'w':
+		axis1IncrementButtonCallback();
+		break;	
+	case 'a':
+		axis2DecrementButtonCallback();
+		break;
+	case 's':
+		axis2IncrementButtonCallback();
+		break;
+	case 'z':
+		axis3DecrementButtonCallback();
+		break;
+	case 'x':
+		axis3IncrementButtonCallback();
+		break;
+	case 'i':
+		instantPaint = !instantPaint;
 		break;
 	}
 	glutPostRedisplay();
