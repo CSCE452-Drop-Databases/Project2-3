@@ -8,7 +8,6 @@
 #include "global_const.h"
 
 #include <stdio.h>
-#include <tchar.h>
 
 #include <cmath>
 #include <iostream>
@@ -19,6 +18,7 @@
 #include "PaintArm.h"
 
 #ifdef _WIN32
+#include <tchar.h>
 #include "windows.h"
 #include "targetver.h"
 #include <gl/glut.h>
@@ -26,4 +26,10 @@
 
 #ifdef __linux__
 #include <GL/glut.h>
+#endif
+
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+ #include <OpenGL/glu.h> 
+#include <GLUT/glut.h>
 #endif

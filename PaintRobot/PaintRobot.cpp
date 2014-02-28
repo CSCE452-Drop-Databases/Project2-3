@@ -12,8 +12,9 @@ struct Color {
 	float r;
 	float g;
 	float b;
+    Color(float r, float g, float b) : r(r), g(g), b(b) {}
 };
-typedef struct Color;
+typedef struct Color Color;
 
 struct PaintCircle {
 	Point p;
@@ -21,7 +22,7 @@ struct PaintCircle {
 };
 
 PaintArm paintArm;
-Color paintBrushColor = { 1.0f, 1.0f, 1.0f };
+Color paintBrushColor = Color( 1.0f, 1.0f, 1.0f );
 int paintButtonMode = 0;
 
 std::vector<Button> controlPanelButtons;
@@ -32,6 +33,11 @@ Mouse mouse = { 0, 0, 0, 0, 0 };
 int axis1Num = 0;
 int axis2Num = 0;
 int axis3Num = 0;
+
+void paintRobotSleep(int ms) {
+    // Sleep(75); // Comment if on Linux
+    sleep(((float)ms)/100.0); //Comment if on Windows
+}
 
 /*----------------------------------------------------------------------------------------
 *	\brief	This function draws a text string to the screen using glut bitmap fonts.
@@ -115,7 +121,9 @@ void ButtonRelease(Button *b, int x, int y)
 					b->callbackFunction();
 				}
 				else {
-					glutIdleFunc(NULL);
+					if (b->type == Button::PRESS) {
+                        glutIdleFunc(NULL);
+                    }
 				}
 			}
 			if (b->cbOnRelease && b->type == Button::TOGGLE) {
@@ -123,6 +131,10 @@ void ButtonRelease(Button *b, int x, int y)
 			}
 
 		}
+
+        if (b->type == Button::TOGGLE) {
+            glutIdleFunc(NULL);
+        }
 
 		if (b->type == Button::TOGGLE && b->mode) {
 			b->state = 1;
@@ -574,7 +586,7 @@ void paintCircle() {
 	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
 	double paintArmAxis03X = paintArmAxis03->get_elem(0, 3);
 	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
-	PaintCircle circle = { Point(paintArmAxis03X, paintArmAxis03Y), { paintBrushColor.r, paintBrushColor.g, paintBrushColor.b } };
+	PaintCircle circle = { Point(paintArmAxis03X, paintArmAxis03Y), Color( paintBrushColor.r, paintBrushColor.g, paintBrushColor.b ) };
 	paint.push_back(circle);
 }
 
@@ -588,7 +600,7 @@ void axis1IncrementButtonCallback() {
 		axis1Num++;
 		resetPaintArm();
 		if (controlPanelButtons[6].mode) paintCircle();
-		Sleep(75);
+		paintRobotSleep(75);
 	}
 	else {
 		std::cout << "ERROR: Cannot move base off of slide!" << std::endl;
@@ -603,7 +615,7 @@ void axis1DecrementButtonCallback() {
 		axis1Num--;
 		resetPaintArm();
 		if (controlPanelButtons[6].mode) paintCircle();
-		Sleep(75);
+		paintRobotSleep(75);
 	}
 	else {
 		std::cout << "ERROR: Cannot move base off of slide!" << std::endl;
@@ -616,7 +628,7 @@ void axis2IncrementButtonCallback() {
 	axis2Num--;
 	resetPaintArm();
 	if (controlPanelButtons[6].mode) paintCircle();
-	Sleep(75);
+	paintRobotSleep(75);
 }
 
 void axis2DecrementButtonCallback() {
@@ -625,7 +637,7 @@ void axis2DecrementButtonCallback() {
 	axis2Num++;
 	resetPaintArm();
 	if (controlPanelButtons[6].mode) paintCircle();
-	Sleep(75);
+	paintRobotSleep(75);
 }
 
 void axis3IncrementButtonCallback() {
@@ -634,7 +646,7 @@ void axis3IncrementButtonCallback() {
 	axis3Num--;
 	resetPaintArm();
 	if (controlPanelButtons[6].mode) paintCircle();
-	Sleep(75);
+	paintRobotSleep(75);
 }
 
 void axis3DecrementButtonCallback() {
@@ -643,7 +655,7 @@ void axis3DecrementButtonCallback() {
 	axis3Num++;
 	resetPaintArm();
 	if (controlPanelButtons[6].mode) paintCircle();
-	Sleep(75);
+	paintRobotSleep(75);
 }
 
 void paintButtonCallback() {
@@ -676,7 +688,7 @@ void colorWhiteButtonCallback() {
 	printf("White Button Pressed!\n");
 	controlPanelButtons[9].mode = 0;
 	controlPanelButtons[9].state = 0;
-	paintBrushColor = { 1.0f, 1.0f, 1.0f };
+	paintBrushColor = Color( 1.0f, 1.0f, 1.0f ); 
 	controlPanelButtons[10].mode = 0;
 	controlPanelButtons[11].mode = 0;
 	controlPanelButtons[12].mode = 0;
@@ -692,7 +704,7 @@ void colorRedButtonCallback() {
 	printf("Red Button Pressed!\n");
 	controlPanelButtons[10].mode = 0;
 	controlPanelButtons[10].state = 0;
-	paintBrushColor = { 1.0f, 0.0f, 0.0f };
+	paintBrushColor = Color( 1.0f, 0.0f, 0.0f );
 	controlPanelButtons[9].mode = 0;
 	controlPanelButtons[11].mode = 0;
 	controlPanelButtons[12].mode = 0;
@@ -708,7 +720,7 @@ void colorBlueButtonCallback() {
 	printf("Blue Button Pressed!\n");
 	controlPanelButtons[11].mode = 0;
 	controlPanelButtons[11].state = 0;
-	paintBrushColor = { 0.0f, 0.0f, 1.0f };
+	paintBrushColor = Color( 0.0f, 0.0f, 1.0f );
 	controlPanelButtons[9].mode = 0;
 	controlPanelButtons[10].mode = 0;
 	controlPanelButtons[12].mode = 0;
@@ -724,7 +736,7 @@ void colorGreenButtonCallback() {
 	printf("Green Button Pressed!\n");
 	controlPanelButtons[12].mode = 0;
 	controlPanelButtons[12].state = 0;
-	paintBrushColor = { 0.0f, 1.0f, 0.0f };
+	paintBrushColor = Color( 0.0f, 1.0f, 0.0f );
 	controlPanelButtons[9].mode = 0;
 	controlPanelButtons[10].mode = 0;
 	controlPanelButtons[11].mode = 0;
