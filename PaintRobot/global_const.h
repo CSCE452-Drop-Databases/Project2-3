@@ -36,7 +36,9 @@ int const robotAreaWidth = WINDOW_WIDTH * GUI_ROBOT_AREA_WIDTH_PERCENT;
 int const robotAreaHeight = WINDOW_HEIGHT * (1 - 2 * GUI_MARGIN_PERCENT);
 
 int const controlPanelWidth = WINDOW_WIDTH * GUI_CONTROL_PANEL_WIDTH_PERCENT;
-int const controlPanelHeight = WINDOW_HEIGHT * (1 - 2 * GUI_MARGIN_PERCENT);
+int const controlPanelHeight = 0.65 * WINDOW_HEIGHT * (1 - 2 * GUI_MARGIN_PERCENT);
+
+//int const worldControlPanelHeight = WINDOW_HEIGHT - controlPanelHeight;
 
 int const slidePosX = (robotAreaWidth - SLIDE_LENGTH) / 2; // where the slider should start in relation to the robot area
 int const slidePosY = SLIDE_LOCATION_PERCENT * robotAreaHeight;

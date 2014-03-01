@@ -511,22 +511,22 @@ void drawControlPanelContents() {
 	int cpTitleY = 0.05 * controlPanelHeight;
 	
 	int cpAxis1TitleX = (controlPanelWidth - glutBitmapLength(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)cpAxis1Title)) / 2;
-	int cpAxis1TitleY = 0.12 * controlPanelHeight;
+	int cpAxis1TitleY = 0.09 * controlPanelHeight;
 
 	int cpAxis2TitleX = (controlPanelWidth - glutBitmapLength(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)cpAxis2Title)) / 2;
-	int cpAxis2TitleY = 0.27 * controlPanelHeight;
+	int cpAxis2TitleY = 0.24 * controlPanelHeight;
 
 	int cpAxis3TitleX = (controlPanelWidth - glutBitmapLength(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)cpAxis2Title)) / 2;
-	int cpAxis3TitleY = 0.42 * controlPanelHeight;
+	int cpAxis3TitleY = 0.39 * controlPanelHeight;
 
 	int cpPaintBrushTitleX = (controlPanelWidth - glutBitmapLength(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)cpPaintBrushTitle)) / 2;
-	int cpPaintBrushTitleY = 0.57 * controlPanelHeight;
+	int cpPaintBrushTitleY = 0.54 * controlPanelHeight;
 
 	int cpClearTitleX = (controlPanelWidth - glutBitmapLength(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)cpClearTitle)) / 2;
-	int cpClearTitleY = 0.72 * controlPanelHeight;
+	int cpClearTitleY = 0.69 * controlPanelHeight;
 
 	int cpColorTitleX = (controlPanelWidth - glutBitmapLength(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)cpColorTitle)) / 2;
-	int cpColorTitleY = 0.87 * controlPanelHeight;
+	int cpColorTitleY = 0.84 * controlPanelHeight;
 
 	glPushMatrix();
 	gotoControlPanel();
@@ -755,34 +755,34 @@ void initButtons() {
 	int buttonHeight = 0.05 * controlPanelHeight;
 	int buttonWidth = (0.85 * controlPanelWidth) / 2;
 
-	int decrementButtonX = 0.05 * controlPanelWidth;
+	int decrementButtonX = 0.07 * controlPanelWidth;
 	int incrementButtonX = (controlPanelWidth / 2) + 0.025 * controlPanelWidth;
 
-	int axis1ButtonY = 0.15 * controlPanelHeight;
+	int axis1ButtonY = 0.12 * controlPanelHeight;
 	Button axis1DecrementButton = { decrementButtonX, axis1ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "-1", axis1DecrementButtonCallback, 0 };
 	Button axis1IncrementButton = { incrementButtonX, axis1ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "+1", axis1IncrementButtonCallback, 0 };
 
-	int axis2ButtonY = 0.30 * controlPanelHeight;
+	int axis2ButtonY = 0.27 * controlPanelHeight;
 	Button axis2DecrementButton = { decrementButtonX, axis2ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "-1", axis2DecrementButtonCallback, 0 };
 	Button axis2IncrementButton = { incrementButtonX, axis2ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "+1", axis2IncrementButtonCallback, 0 };
 	
-	int axis3ButtonY = 0.45 * controlPanelHeight;
+	int axis3ButtonY = 0.42 * controlPanelHeight;
 	Button axis3DecrementButton = { decrementButtonX, axis3ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "-1", axis3DecrementButtonCallback, 0 };
 	Button axis3IncrementButton = { incrementButtonX, axis3ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "+1", axis3IncrementButtonCallback, 0 };
 
-	int paintButtonY = 0.60 * controlPanelHeight;
+	int paintButtonY = 0.57 * controlPanelHeight;
 	int paintButtonWidth = 0.9 * controlPanelWidth;
 	Button paintButton = { decrementButtonX, paintButtonY, paintButtonWidth, 25, Button::TOGGLE, 0, 0, 0, "Paint", paintButtonCallback, 1 };
 
-	int clearButtonY = 0.75 * controlPanelHeight;
+	int clearButtonY = 0.72 * controlPanelHeight;
 	Button clearButton = { decrementButtonX, clearButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "Clear Paint", clearButtonCallback, 1 };
 	Button resetButton = { incrementButtonX, clearButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "Reset", resetButtonCallback, 1 };
 
-	int colorRow1ButtonY = 0.90 * controlPanelHeight;
+	int colorRow1ButtonY = 0.87 * controlPanelHeight;
 	Button colorWhiteButton = { decrementButtonX, colorRow1ButtonY, buttonWidth, 25, Button::TOGGLE, 1, 1, 0, "White", colorWhiteButtonCallback, 1 };
 	Button colorRedButton = { incrementButtonX, colorRow1ButtonY, buttonWidth, 25, Button::TOGGLE, 0, 0, 0, "Red", colorRedButtonCallback, 1 };
 
-	int colorRow2ButtonY = 0.90 * controlPanelHeight + 30;
+	int colorRow2ButtonY = 0.87 * controlPanelHeight + 30;
 	Button colorBlueButton = { decrementButtonX, colorRow2ButtonY, buttonWidth, 25, Button::TOGGLE, 0, 0, 0, "Blue", colorBlueButtonCallback, 1 };
 	Button colorGreenButton = { incrementButtonX, colorRow2ButtonY, buttonWidth, 25, Button::TOGGLE, 0, 0, 0, "Green", colorGreenButtonCallback, 1 };
 
