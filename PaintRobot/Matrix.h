@@ -8,9 +8,6 @@
 
 */
 
-#pragma once
-#include "stdafx.h"
-//#include "global_const.h"
 
 class Matrix {
 	private:

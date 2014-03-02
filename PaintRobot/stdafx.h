@@ -12,6 +12,10 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+#include <map>
+#include <chrono>
+#include <thread>
+#include "Utilities.h"
 #include "Button.h"
 #include "Mouse.h"
 #include "Matrix.h"
@@ -29,7 +33,6 @@
 #endif
 
 #ifdef __APPLE__
-#include <OpenGL/gl.h>
- #include <OpenGL/glu.h> 
+#include <OpenGL/gl.h> #include <OpenGL/glu.h>
 #include <GLUT/glut.h>
 #endif

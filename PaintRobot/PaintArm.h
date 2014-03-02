@@ -8,11 +8,6 @@
 
 */
 
-#pragma once
-#include "stdafx.h"
-//#include "global_const.h"
-//#include "matrix.h"
-
 class PaintArm {
 	private:
 		Matrix* matT_Z_rot(double theta_in_deg, double offset_x, double offset_y, double offset_z);

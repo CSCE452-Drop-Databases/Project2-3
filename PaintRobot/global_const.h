@@ -46,6 +46,9 @@ int const controlPanelWidth = WINDOW_WIDTH * GUI_CONTROL_PANEL_WIDTH_PERCENT;
 int const controlPanelJointHeight = GUI_CONTROL_PANEL_JOINT_HEIGHT_PERCENT * WINDOW_HEIGHT;
 int const controlPanelWorldHeight = GUI_CONTROL_PANEL_WORLD_HEIGHT_PERCENT * WINDOW_HEIGHT;
 
+int const robotAreaOriginX = WINDOW_WIDTH * GUI_MARGIN_PERCENT;
+int const robotAreaOriginY = WINDOW_HEIGHT * GUI_MARGIN_PERCENT;
+
 int const controlPanelJointOriginX = WINDOW_WIDTH * (1 - GUI_MARGIN_PERCENT) - WINDOW_WIDTH * GUI_CONTROL_PANEL_WIDTH_PERCENT;
 int const controlPanelJointOriginY = WINDOW_HEIGHT * GUI_MARGIN_PERCENT;
 
@@ -74,3 +77,5 @@ int const SLIDE_AMOUNT = 1;
 int const LINK_WIDTH = 20;
 
 int const PAINT_CIRCLE_RADIUS = 10;
+
+int const JOINT_SLEEP_TIME = 50;
