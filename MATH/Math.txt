@@ -1,0 +1,27 @@
+INVERSE KINEMATICS
+
+Solving for Theta1
+
+We don't need to solve for Theta1 since it will always be 90 deg
+
+
+Solving for Theta2
+
+Given the X and Y of the last link (easily observable)
+Using Law of Cosines:
+
+X^2 + Y^2 = L1^2 + L2^2 - (L1)(L2)(cos(180 + Theta2))
+
+reduced to:
+
+cos(Theta2) = (X^2 + Y^2 - (L1^2 + L2^2)) / (2(L1)(L2))
+
+Theta2 = cos^-1((X^2 + Y^2 - (L1^2 + L2^2)) / (2(L1)(L2)))
+
+Solving for Theta3
+
+Since Theta1 + Theta2 + Theta3 = SUM
+And we should know the SUM
+
+Theta3 = SUM - (Theta1 + Theta2)
+
