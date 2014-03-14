@@ -7,6 +7,15 @@ We don't need to solve for Theta1 since it will always be 90 deg
 
 Solving for Theta2
 
+If we are incrementing the x component, Theta2 will not change since we should only have to move
+the prismatic joint inn the direction of the change. i.e. x +1, translate prismatic right
+
+If we are incrementing the y component, the prismatic joint will have to move as well as the last joint. 
+If the last joint moves up, the prismatic joint will need to move towards joint 3's (x,y)
+the number of units y changed
+If the last joint moves down, the prismatic joint should move away from joint 3's (x,y)
+the number of units y changed
+
 Given the X and Y of the last link (easily observable)
 Using Law of Cosines:
 
@@ -20,8 +29,11 @@ Theta2 = cos^-1((X^2 + Y^2 - (L1^2 + L2^2)) / (2(L1)(L2)))
 
 Solving for Theta3
 
-Since Theta1 + Theta2 + Theta3 = SUM
+/*Since Theta1 + Theta2 + Theta3 = SUM
 And we should know the SUM
 
-Theta3 = SUM - (Theta1 + Theta2)
+Theta3 = SUM - (Theta1 + Theta2)*/
+
+I believe Theta3 should also remain unchanged
+Paul if you could take a look at this part
 
