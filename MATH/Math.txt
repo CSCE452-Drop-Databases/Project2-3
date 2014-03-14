@@ -37,3 +37,38 @@ Theta3 = SUM - (Theta1 + Theta2)*/
 I believe Theta3 should also remain unchanged
 Paul if you could take a look at this part
 
+-------------------------------------------------------------------
+
+Paul Edit:
+
+Theta1 = 90
+
+X0 is the translation of the prismatic joint
+
+
+Solve for Theta3 in terms X0 using of Law of Cosines:
+End of Link 1 is at (X0, L1)
+End of Link 3 is at (X3, Y3)
+
+(X3 - X0)^2 + (Y3 - L0)^2 = L3^2 + L2^2 - 2(L3)(L2)cos(Theta3)
+Theta3 = cos^-1((-(X3 - X0)^2 - (Y3 - L0)^2 + L3^2 + L2^2) / (2L3 * L2))
+
+
+To find Theta2, we note that the angle between the line from (X3, Y3) to (X1, Y1)
+is equal to Theta2 + the angle between the line from (X2, Y2) to (X1, Y1).  We can find these angles, which we call Phi1 and Phi2, with law of cosines.
+
+_____________________________________
+Solving for Phi1, the angle between the line from (X3, Y3) to (X1, Y1):
+
+(X3 - X0)^2 + (Y3)^2 = (X3 - X0)^2 + (Y3 - L0)^2 + L1^2 - (sqrt((X3 - X0)^2 + 2(Y3 - L0)^2))(L1)cos(Phi1)
+
+Phi1 = cos^-1(((X3 - X0)^2 + (Y3 - L0)^2 +L1^2  - (X3 - X0)^2 - (Y3)^2) / (2sqrt((X3 - X0)^2 + (Y3 - L0)^2) * L1))
+_______________________
+Solving for Phi2, the angle between the line from (X2, Y2) to (X1, Y1):
+
+L3 ^2 = (X3 - X0)^2 + (Y3 - L0)^2 + L2^2 - (sqrt((X3 - X0)^2 + 2(Y3 - L0)^2))(L2)cos(Phi2)
+
+Phi2 = cos^-1(((X3 - X0)^2 + (Y3 - L0)^2 - L3^2 + L2^2) / (2sqrt((X3 - X0)^2 + (Y3 - L0)^2) * L2))
+__________________________________________________
+Finally, Theta2 = Phi1 - Phi2
+
