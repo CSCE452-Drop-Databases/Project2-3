@@ -167,11 +167,11 @@ void PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
 	double theta1_deg = 90;
 	double theta2;
 	//Theta3 = cos^-1((-(X3 - X0)^2 - (Y3 - L0)^2 + L3^2 + L2^2) / (L3 * L2))
-	double theta3 = acos((-(xpos - slide)*(xpos-slide) -(ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1)+LINK_LENGTH_2*LINK_LENGTH_2 + LINK_LENGTH_3*LINK_LENGTH_3)/(2*LINK_LENGTH_2*LINK_LENGTH_3); 
+	double theta3 = acos((-(xpos - slide)*(xpos - slide) - (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1) + LINK_LENGTH_2*LINK_LENGTH_2 + LINK_LENGTH_3*LINK_LENGTH_3) / (2 * LINK_LENGTH_2*LINK_LENGTH_3));
 	//Phi2 = cos^-1(((X3 - X0)^2 + (Y3 - L0)^2 - L3^2 + L2^2) / (sqrt((X3 - X0)^2 + (Y3 - L0)^2) * L2))
-	double Phi2 = acos(((xpos - slide)*(xpos-slide) +(ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1) + LINK_LENGTH_2*LINK_LENGTH_2 - LINK_LENGTH_3*LINK_LENGTH_3)/(2*LINK_LENGTH_2 * sqrt((xpos - slide)*(xpos-slide) +(ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1))))
+	double Phi2 = acos(((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1) + LINK_LENGTH_2*LINK_LENGTH_2 - LINK_LENGTH_3*LINK_LENGTH_3) / (2 * LINK_LENGTH_2 * sqrt((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1))));
 	//Phi1 = cos^-1(((X3 - X0)^2 + (Y3 - L0)^2 +L1^2  - (X3 - X0)^2 - (Y3)^2) / (2sqrt((X3 - X0)^2 + (Y3 - L0)^2) * L1))
-	double Phi1 = acos(((xpos - slide)*(xpos-slide) +(ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1) + LINK_LENGTH_1*LINK_LENGTH_1 -(xpos - slide)*(xpos-slide) -(ypos)*(ypos))/(2*LINK_LENGTH_1 * sqrt((xpos - slide)*(xpos-slide) +(ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1))))
+	double Phi1 = acos(((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1) + LINK_LENGTH_1*LINK_LENGTH_1 - (xpos - slide)*(xpos - slide) - (ypos)*(ypos)) / (2 * LINK_LENGTH_1 * sqrt((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1))));
 	theta2 = Phi1 - Phi2;
 	double theta2_deg = theta2*180.0 / 3.14159265;
 	double theta3_deg = theta3*180.0 / 3.14159265;
