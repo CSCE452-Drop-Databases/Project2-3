@@ -159,13 +159,22 @@ Matrix* PaintArm::matT_base_to_joint_n(int n) {
 	return _t;
 }
 
-void PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
+//Return 1 if outside reachable workspace
+int PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
 	double slide;
 	if(xpos<0) slide = 0;
 	else if (xpos < SLIDE_LENGTH) slide = xpos;
 	else slide = SLIDE_LENGTH;
 	double theta1_deg = 90;
 	double theta2;
+	
+	//Check if we are outside reachable workspace by making sure both of the triangles we are using to calculate angles are non-degenerate
+	if((sqrt((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1)) > (LINK_LENGTH_2 + LINK_LENGTH_3)) || (sqrt((xpos - slide)*(xpos - slide) - (ypos)*(ypos)) > (LINK_LENGTH_1 + (sqrt((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1)))))) return 1;
+	
+	
+	
+	
+	
 	//Theta3 = cos^-1((-(X3 - X0)^2 - (Y3 - L0)^2 + L3^2 + L2^2) / (L3 * L2))
 	double theta3 = acos((-(xpos - slide)*(xpos - slide) - (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1) + LINK_LENGTH_2*LINK_LENGTH_2 + LINK_LENGTH_3*LINK_LENGTH_3) / (2 * LINK_LENGTH_2*LINK_LENGTH_3));
 	//Phi2 = cos^-1(((X3 - X0)^2 + (Y3 - L0)^2 - L3^2 + L2^2) / (sqrt((X3 - X0)^2 + (Y3 - L0)^2) * L2))
@@ -173,9 +182,8 @@ void PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
 	//Phi1 = cos^-1(((X3 - X0)^2 + (Y3 - L0)^2 +L1^2  - (X3 - X0)^2 - (Y3)^2) / (2sqrt((X3 - X0)^2 + (Y3 - L0)^2) * L1))
 	double Phi1 = acos(((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1) + LINK_LENGTH_1*LINK_LENGTH_1 - (xpos - slide)*(xpos - slide) - (ypos)*(ypos)) / (2 * LINK_LENGTH_1 * sqrt((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1))));
 	theta2 = Phi1 - Phi2;
-	double theta2_deg = theta2*180.0 / 3.14159265;
-	double theta3_deg = theta3*180.0 / 3.14159265;
 
+	
 	_T_Matrices[0]->assign_element(0, 3, (slide));
 
 	_T_Matrices[2]->assign_element(0, 0, deci_round(cos(theta2)));
@@ -189,6 +197,7 @@ void PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
 
 	_T_Matrices[2]->assign_element(1, 1, deci_round(cos(theta2)));
 	_T_Matrices[3]->assign_element(1, 1, deci_round(cos(theta3)));
+	return 0;
 }
 
 
