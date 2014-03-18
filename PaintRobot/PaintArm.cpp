@@ -76,7 +76,7 @@ void PaintArm::rotate(int joint_index, double rotation_in_deg) {
 	double a_00 = _T_Matrices[joint_index]->get_elem(0, 0);
 	_T_Matrices[joint_index]->assign_element(0, 0, deci_round(cos(acos(a_00) + theta_in_rads)));
 	double a_01 = _T_Matrices[joint_index]->get_elem(0, 1);
-	_T_Matrices[joint_index]->assign_element(0, 1, deci_round(-1.0*sin((asin(a_01*-1.0)) + theta_in_rads)));
+	_T_Matrices[joint_index]->assign_element(0, 1, deci_round(-1.0*sin((asin(-1.0 * a_01)) + theta_in_rads)));
 
 	double a_10 = _T_Matrices[joint_index]->get_elem(1, 0);
 	_T_Matrices[joint_index]->assign_element(1, 0, deci_round(sin(asin(a_10) + theta_in_rads)));
@@ -92,7 +92,7 @@ void PaintArm::rotate(int joint_index, double rotation_in_deg) {
 	}
 	
 	// I DON'T KNOW WHY I HAVE TO DO THIS BUT IT MAKES IT WORK
-	//base_to_n[joint_index+1] = matT_base_to_joint_n(joint_index+1);
+	base_to_n[joint_index+1] = matT_base_to_joint_n(joint_index+1);
 	// I DON'T KNOW WHY I HAVE TO DO THIS BUT IT MAKES IT WORK
 }
 
@@ -161,6 +161,7 @@ Matrix* PaintArm::matT_base_to_joint_n(int n) {
 }
 
 void PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
+	// (abs(paintArm.get_T_Matrix(0, 0)->get_elem(0, 3) + SLIDE_AMOUNT) <= SLIDE_LENGTH / 2
 	double slide;
 	if(xpos<0) slide = 0;
 	else if (xpos < SLIDE_LENGTH) slide = xpos;

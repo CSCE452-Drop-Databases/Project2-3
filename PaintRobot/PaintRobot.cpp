@@ -78,7 +78,7 @@ float getAngle(int joint1, int joint2) {
 	float joint2y = paintArm.get_T_Matrix(0, joint2)->get_elem(1, 3);
 
 	//std::cout << "(" << joint1x << ", " << joint1y << "), (" << joint2x << ", " << joint2y << "), (" << joint3x << ", " << joint3y << ")" << std::endl;
-
+	std::cout << "Distance between " << joint1 << " and " << joint2 << " = " << sqrt(pow((joint2x - joint1x), 2) + pow((joint2y - joint1y), 2)) << std::endl;
 
 	float tempy = (joint2y - joint1y);
 	float tempx = (joint2x - joint1x);
@@ -93,24 +93,30 @@ float getAngle(int joint1, int joint2) {
 	int dif = ceil(90 - abs(theta));
 	theta = r * dif;
 
+	std::cout << "Angle between " << joint1 << " and " << joint2 << " = " << theta << std::endl;
+
 	return theta;
 }
 
 
 void resetPaintArm() {
-	int joint0x = paintArm.get_T_Matrix(0, 0)->get_elem(0, 3);
-	//std::cout << "---------Joint 3 angle-------------" << std::endl;
-	float joint1t = getAngle(1, 2);
-	float joint2t = getAngle(2, 3);
-	//axis2Num = 0;
-	//axis3Num = 0;
 
-	//std::cout << joint2t << std::endl;
-	//std::cout << "----------------------" << std::endl;
+	//Matrix* paintArmAxis00 = paintArm.get_T_Matrix(0, 0);
+	//Matrix* paintArmAxis01 = paintArm.get_T_Matrix(0, 1);
+	//Matrix* paintArmAxis02 = paintArm.get_T_Matrix(0, 2);
+	//Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
+
+
+
+	int translate = paintArm.get_T_Matrix(0, 0)->get_elem(0, 3);
+	float joint1r = getAngle(1, 2);
+	float joint2r = getAngle(2, 3);
+
 	paintArm = (*new PaintArm());
-	paintArm.translate(0, joint0x, 0);
-	paintArm.rotate(1, joint1t);
-	paintArm.rotate(2, joint2t);
+	paintArm.rotate(0, 90);
+	paintArm.translate(0, translate, 0);
+	paintArm.rotate(1, joint1r);
+	paintArm.rotate(2, joint2r);
 	glutPostRedisplay();
 }
 
@@ -167,12 +173,15 @@ void drawRobotAreaContents() {
 	Point midpoint12 = paintArmAxisMidpoint(1, 2);
 	Point midpoint23 = paintArmAxisMidpoint(2, 3);
 
-	double offset1 = paintArmAxis00X + paintArmAxis02X;
-//	midpoint12.x -= offset1;
+	double offset1X = paintArmAxis01X - paintArmAxis02X;
+	double offset1Y = paintArmAxis01Y - paintArmAxis02Y;
+	//std::cout << "TEST: " << paintArmAxis01Y << ", " << paintArmAxis02Y << std::endl;
+	//midpoint12.x += offset1X;
+	//midpoint12.y += offset1Y;
 
 
 	glPushMatrix();
-	glTranslatef(midpoint23.x, -midpoint23.y, 0);
+	glTranslatef(-midpoint23.x, -midpoint23.y, 0);
 	glRotatef(getAngle(2,3) + getAngle(1,2), 0.0f, 0.0f, 1.0f);
 	glBegin(GL_TRIANGLE_STRIP);
 		glColor3f(0.0f, 0.0f, 107.0f / 255.0f);
@@ -181,7 +190,7 @@ void drawRobotAreaContents() {
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(midpoint12.x, -midpoint12.y, 0);
+	glTranslatef(-midpoint12.x, -midpoint12.y, 0);
 	glRotatef(getAngle(1,2), 0.0f, 0.0f, 1.0f);
 	glBegin(GL_TRIANGLE_STRIP);
 		glColor3f(0.0f, 107.0f / 255.0f, 0.0f);
@@ -191,7 +200,7 @@ void drawRobotAreaContents() {
 
 	glBegin(GL_TRIANGLE_STRIP);
 		glColor3f(107.0f / 255.0f, 0.0f, 0.0f);
-		ellipseMidpoint(midpoint01.x, -midpoint01.y, LINK_WIDTH / 2, LINK_LENGTH_1 / 2);
+		ellipseMidpoint(-midpoint01.x, -midpoint01.y, LINK_WIDTH / 2, LINK_LENGTH_1 / 2);
 	glEnd();
 
 	glColor3f(0.0f, 1.0f, 0.0f);
@@ -332,7 +341,7 @@ void paintCircle() {
 	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
 	double paintArmAxis03X = paintArmAxis03->get_elem(0, 3);
 	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
-	PaintCircle circle = { Point(paintArmAxis03X, paintArmAxis03Y), Color(paintBrushColor.r, paintBrushColor.g, paintBrushColor.b) };
+	PaintCircle circle = { Point(-paintArmAxis03X, paintArmAxis03Y), Color(paintBrushColor.r, paintBrushColor.g, paintBrushColor.b) };
 	paint.push_back(circle);
 }
 
@@ -344,8 +353,8 @@ void axis1IncrementButtonCallback() {
 	printf("Axis 1 Increment Button Pressed!\n");
 	if (abs(paintArm.get_T_Matrix(0, 0)->get_elem(0, 3) + SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
 		//axis1Num++;
-		paintArm.translate(0, 1, 0);
-		//resetPaintArm();
+		paintArm.translate(0, -1, 0);
+		resetPaintArm();
 		if (paintButtonMode) paintCircle();
 		paintRobotSleep(JOINT_SLEEP_TIME);
 	}
@@ -359,8 +368,8 @@ void axis1DecrementButtonCallback() {
 	printf("Axis 1 Decrement Button Pressed!\n");
 	if (abs(paintArm.get_T_Matrix(0, 0)->get_elem(0, 3) - SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
 		//axis1Num--;
-		paintArm.translate(0,-1,0);
-		//resetPaintArm();
+		paintArm.translate(0,1,0);
+		resetPaintArm();
 		if (paintButtonMode) paintCircle();
 		paintRobotSleep(JOINT_SLEEP_TIME);
 	}
@@ -374,8 +383,8 @@ void axis2IncrementButtonCallback() {
 	printf("Axis 2 Increment Button Pressed!\n");
 	//axis2Num = -1;
 	//axis2Rot = true;
-	paintArm.rotate(1, -1);
-	//resetPaintArm();
+	paintArm.rotate(1, 1);
+	resetPaintArm();
 	if (paintButtonMode) paintCircle();
 	paintRobotSleep(JOINT_SLEEP_TIME);
 }
@@ -385,8 +394,8 @@ void axis2DecrementButtonCallback() {
 	printf("Axis 2 Decrement Button Pressed!\n");
 	//axis2Num++;
 	//axis2Num = 1;
-	paintArm.rotate(1, 1);
-	//resetPaintArm();
+	paintArm.rotate(1, -1);
+	resetPaintArm();
 	if (paintButtonMode) paintCircle();
 	paintRobotSleep(JOINT_SLEEP_TIME);
 }
@@ -396,8 +405,8 @@ void axis3IncrementButtonCallback() {
 	printf("Axis 3 Increment Button Pressed!\n");
 	//axis3Num--;
 	//axis3Num = -1;
-	paintArm.rotate(2, -1);
-	//resetPaintArm();
+	paintArm.rotate(2, 1);
+	resetPaintArm();
 	if (paintButtonMode) paintCircle();
 	paintRobotSleep(JOINT_SLEEP_TIME);
 }
@@ -407,8 +416,8 @@ void axis3DecrementButtonCallback() {
 	printf("Axis 3 Decrement Button Pressed!\n");
 	//axis3Num++;
 	//axis3Num = 1;
-	paintArm.rotate(2, 1);
-	//resetPaintArm();
+	paintArm.rotate(2, -1);
+	resetPaintArm();
 	if (paintButtonMode) paintCircle();
 	paintRobotSleep(JOINT_SLEEP_TIME);
 }
@@ -506,20 +515,37 @@ void colorGreenButtonCallback() {
 void worldXDecrementButtonCallback() {
 	printf("World X Decrement Button Pressed!\n");
 	Matrix* axis3 = paintArm.get_T_Matrix(0, 3);
-	paintArm.calc_Inverse_Kinematics(axis3->get_elem(0,3)-1, axis3->get_elem(1,3));
-	glutPostRedisplay();
+	paintArm.calc_Inverse_Kinematics(axis3->get_elem(0,3)+1, axis3->get_elem(1,3));
+	resetPaintArm();
+	if (paintButtonMode) paintCircle();
+	paintRobotSleep(JOINT_SLEEP_TIME);
 }
 
 void worldXIncrementButtonCallback() {
 	printf("World X Increment Button Pressed!\n");
+	Matrix* axis3 = paintArm.get_T_Matrix(0, 3);
+	paintArm.calc_Inverse_Kinematics(axis3->get_elem(0, 3) - 1, axis3->get_elem(1, 3));
+	resetPaintArm();
+	if (paintButtonMode) paintCircle();
+	paintRobotSleep(JOINT_SLEEP_TIME);
 }
 
 void worldYDecrementButtonCallback() {
 	printf("World Y Decrement Button Pressed!\n");
+	Matrix* axis3 = paintArm.get_T_Matrix(0, 3);
+	paintArm.calc_Inverse_Kinematics(axis3->get_elem(0, 3), axis3->get_elem(1, 3) + 1);
+	resetPaintArm();
+	if (paintButtonMode) paintCircle();
+	paintRobotSleep(JOINT_SLEEP_TIME);
 }
 
 void worldYIncrementButtonCallback() {
 	printf("World Y Increment Button Pressed!\n");
+	Matrix* axis3 = paintArm.get_T_Matrix(0, 3);
+	paintArm.calc_Inverse_Kinematics(axis3->get_elem(0, 3), axis3->get_elem(1, 3) - 1);
+	resetPaintArm();
+	if (paintButtonMode) paintCircle();
+	paintRobotSleep(JOINT_SLEEP_TIME);
 }
 
 
@@ -841,6 +867,7 @@ int getAngleTest(int joint1, int joint2) {
 	float joint3y = p.get_T_Matrix(0, joint3)->get_elem(1, 3);
 
 	std::cout << "(" << joint1x << ", " << joint1y << "), (" << joint2x << ", " << joint2y << "), (" << joint3x << ", " << joint3y << ")" << std::endl;
+	std::cout << "Distance between " << joint1 << " and " << joint2 << " = " << sqrt(pow((joint2x - joint1x), 2) + pow((joint2y - joint1y), 2)) << std::endl;
 
 
 	float tempy = (joint2y - joint1y);
@@ -873,7 +900,16 @@ int main(int argc, char **argv)
 	paintArm.rotate(0, 90);
 
 	//p.rotate(0, 90);
-	//p.rotate(1, 1);
+	//p.rotate(1, -8);
+	//p.rotate(1, -1);
+	//p.rotate(1, -1);
+	//p.rotate(1, -1);
+	//p.rotate(1, -1);
+	//p.rotate(1, -1);
+	//p.rotate(1, -1);
+	//p.rotate(1, -1);
+	//p.rotate(1, -1);
+
 	//
 	//getAngleTest(1, 2);
 
