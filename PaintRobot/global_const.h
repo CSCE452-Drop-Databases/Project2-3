@@ -78,4 +78,4 @@ int const LINK_WIDTH = 20;
 
 int const PAINT_CIRCLE_RADIUS = 10;
 
-int const JOINT_SLEEP_TIME = 50;
+int const JOINT_SLEEP_TIME = 25;

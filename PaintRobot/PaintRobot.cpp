@@ -514,20 +514,22 @@ void colorGreenButtonCallback() {
 
 void worldXDecrementButtonCallback() {
 	printf("World X Decrement Button Pressed!\n");
-	Matrix* axis3 = paintArm.get_T_Matrix(0, 3);
-	paintArm.calc_Inverse_Kinematics(axis3->get_elem(0,3)+1, axis3->get_elem(1,3));
-	resetPaintArm();
-	if (paintButtonMode) paintCircle();
-	paintRobotSleep(JOINT_SLEEP_TIME);
+	//Matrix* axis3 = paintArm.get_T_Matrix(0, 3);
+	//paintArm.calc_Inverse_Kinematics(axis3->get_elem(0,3)+1, axis3->get_elem(1,3));
+	//resetPaintArm();
+	//if (paintButtonMode) paintCircle();
+	//paintRobotSleep(JOINT_SLEEP_TIME);
+	axis1DecrementButtonCallback();
 }
 
 void worldXIncrementButtonCallback() {
 	printf("World X Increment Button Pressed!\n");
-	Matrix* axis3 = paintArm.get_T_Matrix(0, 3);
-	paintArm.calc_Inverse_Kinematics(axis3->get_elem(0, 3) - 1, axis3->get_elem(1, 3));
-	resetPaintArm();
-	if (paintButtonMode) paintCircle();
-	paintRobotSleep(JOINT_SLEEP_TIME);
+	//Matrix* axis3 = paintArm.get_T_Matrix(0, 3);
+	//paintArm.calc_Inverse_Kinematics(axis3->get_elem(0, 3) - 1, axis3->get_elem(1, 3));
+	//resetPaintArm();
+	//if (paintButtonMode) paintCircle();
+	//paintRobotSleep(JOINT_SLEEP_TIME);
+	axis1IncrementButtonCallback();
 }
 
 void worldYDecrementButtonCallback() {
@@ -910,7 +912,7 @@ int main(int argc, char **argv)
 	//p.rotate(1, -1);
 	//p.rotate(1, -1);
 
-	//
+	
 	//getAngleTest(1, 2);
 
 	//int joint1 = 1;
@@ -943,13 +945,6 @@ int main(int argc, char **argv)
 	initGraphics();
 	initJointButtons();
 	initWorldButtons();
-
-
-
-
-
-
-
 
 	glutMainLoop();
 }
