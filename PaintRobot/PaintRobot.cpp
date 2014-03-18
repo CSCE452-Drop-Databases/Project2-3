@@ -13,10 +13,11 @@ int instantPaint = 0; // for use with the macro paint buttons
 ButtonMap controlPanelButtons;
 std::vector<PaintCircle> paint;
 
-int axis1Num = 0;
+//int axis1Num = 0;
 int axis2Num = 0;
+//bool axis2Rot = false;
 int axis3Num = 0;
-
+//bool axis3Rot = false;
 
 
 
@@ -58,11 +59,42 @@ void ButtonsPassive(int x, int y) {
 	}
 }
 
+float getAngle(int joint1, int joint2) {
+	// joints should be consecutive and either 1, 2, or 3
+	float joint1x = paintArm.get_T_Matrix(0, joint1)->get_elem(0, 3);
+	float joint1y = paintArm.get_T_Matrix(0, joint1)->get_elem(1, 3);
+
+	float joint2x = paintArm.get_T_Matrix(0, joint2)->get_elem(0, 3);
+	float joint2y = paintArm.get_T_Matrix(0, joint2)->get_elem(1, 3);
+
+	std::cout << "(" << joint1x << ", " << joint1y << "), (" << joint2x << ", " << joint2y << ")" << std::endl;
+
+
+	float tempy = (joint2y - joint1y);
+	float tempx = (joint2x - joint1x);
+
+	if (tempx == 0) return 0;
+
+	float theta = atan(tempy / tempx) * 180 / 3.14159265;
+	//std::cout << "Theta is " << theta << std::endl;
+	return theta;
+}
+
+
 void resetPaintArm() {
+	int joint0x = paintArm.get_T_Matrix(0, 0)->get_elem(0, 3);
+	std::cout << "---------Joint 3 angle-------------" << std::endl;
+	float joint1t = getAngle(1, 2) + axis2Num;
+	float joint2t = getAngle(2, 3) + axis3Num;
+	axis2Num = 0;
+	axis3Num = 0;
+
+	std::cout << joint2t << std::endl;
+	std::cout << "----------------------" << std::endl;
 	paintArm = (*new PaintArm());
-	paintArm.translate(0, axis1Num * SLIDE_AMOUNT, 0);
-	paintArm.rotate(1, axis2Num * ROTATE_AMOUNT);
-	paintArm.rotate(2, axis3Num * ROTATE_AMOUNT);
+	paintArm.translate(0, joint0x, 0);
+	paintArm.rotate(1, joint1t);
+	paintArm.rotate(2, joint2t);
 	glutPostRedisplay();
 }
 
@@ -121,7 +153,7 @@ void drawRobotAreaContents() {
 
 	glPushMatrix();
 	glTranslatef(midpoint23.x, -midpoint23.y, 0);
-	glRotatef((-axis3Num * ROTATE_AMOUNT) + (-axis2Num * ROTATE_AMOUNT), 0.0f, 0.0f, 1.0f);
+	glRotatef(getAngle(2,3) + getAngle(1,2), 0.0f, 0.0f, 1.0f);
 	glBegin(GL_TRIANGLE_STRIP);
 		glColor3f(0.0f, 0.0f, 107.0f / 255.0f);
 		ellipseMidpoint(0, 0, LINK_WIDTH / 2, LINK_LENGTH_3 / 2);
@@ -130,7 +162,7 @@ void drawRobotAreaContents() {
 
 	glPushMatrix();
 	glTranslatef(midpoint12.x, -midpoint12.y, 0);
-	glRotatef(-axis2Num * ROTATE_AMOUNT, 0.0f, 0.0f, 1.0f);
+	glRotatef(getAngle(1,2), 0.0f, 0.0f, 1.0f);
 	glBegin(GL_TRIANGLE_STRIP);
 		glColor3f(0.0f, 107.0f / 255.0f, 0.0f);
 		ellipseMidpoint(0, 0, LINK_WIDTH / 2, LINK_LENGTH_2 / 2);
@@ -275,8 +307,9 @@ void paintCircle() {
 void axis1IncrementButtonCallback() {
 	// move axis1 1px right
 	printf("Axis 1 Increment Button Pressed!\n");
-	if (abs(axis1Num * SLIDE_AMOUNT + SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
-		axis1Num++;
+	if (abs(paintArm.get_T_Matrix(0, 0)->get_elem(0, 3) + SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
+		//axis1Num++;
+		paintArm.translate(0, 1, 0);
 		resetPaintArm();
 		if (paintButtonMode) paintCircle();
 		paintRobotSleep(JOINT_SLEEP_TIME);
@@ -289,8 +322,9 @@ void axis1IncrementButtonCallback() {
 void axis1DecrementButtonCallback() {
 	// move axis1 1px left
 	printf("Axis 1 Decrement Button Pressed!\n");
-	if (abs(axis1Num * SLIDE_AMOUNT - SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
-		axis1Num--;
+	if (abs(paintArm.get_T_Matrix(0, 0)->get_elem(0, 3) - SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
+		//axis1Num--;
+		paintArm.translate(0,-1,0);
 		resetPaintArm();
 		if (paintButtonMode) paintCircle();
 		paintRobotSleep(JOINT_SLEEP_TIME);
@@ -303,7 +337,9 @@ void axis1DecrementButtonCallback() {
 void axis2IncrementButtonCallback() {
 	// rotate axis2 +1 degree
 	printf("Axis 2 Increment Button Pressed!\n");
-	axis2Num--;
+	axis2Num = -1;
+	//axis2Rot = true;
+	//paintArm.rotate(1, 1);
 	resetPaintArm();
 	if (paintButtonMode) paintCircle();
 	paintRobotSleep(JOINT_SLEEP_TIME);
@@ -312,7 +348,8 @@ void axis2IncrementButtonCallback() {
 void axis2DecrementButtonCallback() {
 	// rotate axis2 -1 degree
 	printf("Axis 2 Decrement Button Pressed!\n");
-	axis2Num++;
+	//axis2Num++;
+	axis2Num = 1;
 	resetPaintArm();
 	if (paintButtonMode) paintCircle();
 	paintRobotSleep(JOINT_SLEEP_TIME);
@@ -321,7 +358,8 @@ void axis2DecrementButtonCallback() {
 void axis3IncrementButtonCallback() {
 	// rotate axis3 +1 degree
 	printf("Axis 3 Increment Button Pressed!\n");
-	axis3Num--;
+	//axis3Num--;
+	axis3Num = -1;
 	resetPaintArm();
 	if (paintButtonMode) paintCircle();
 	paintRobotSleep(JOINT_SLEEP_TIME);
@@ -330,7 +368,8 @@ void axis3IncrementButtonCallback() {
 void axis3DecrementButtonCallback() {
 	// rotate axis3 -1 degree
 	printf("Axis 3 Decrement Button Pressed!\n");
-	axis3Num++;
+	//axis3Num++;
+	axis3Num = 1;
 	resetPaintArm();
 	if (paintButtonMode) paintCircle();
 	paintRobotSleep(JOINT_SLEEP_TIME);
@@ -352,7 +391,7 @@ void resetButtonCallback() {
 	printf("Reset Button Pressed!\n");
 	paint.clear();
 	paintArm = (*new PaintArm());
-	axis1Num = 0;
+	//axis1Num = 0;
 	axis2Num = 0;
 	axis3Num = 0;
 	controlPanelButtons["paint"].mode = 0;
@@ -427,6 +466,9 @@ void colorGreenButtonCallback() {
 
 void worldXDecrementButtonCallback() {
 	printf("World X Decrement Button Pressed!\n");
+	Matrix* axis3 = paintArm.get_T_Matrix(0, 3);
+	paintArm.calc_Inverse_Kinematics(axis3->get_elem(0,3)-1, axis3->get_elem(1,3));
+	glutPostRedisplay();
 }
 
 void worldXIncrementButtonCallback() {
