@@ -18,7 +18,8 @@ PaintArm::PaintArm() {
 	_T_Matrices.clear();
 	base_to_n.clear();
 
-	Matrix* t_mat_base_to_joint_0 = matT_Z_rot(90, 0, 0, 0);
+	//Matrix* t_mat_base_to_joint_0 = matT_Z_rot(90, 0, 0, 0);
+	Matrix* t_mat_base_to_joint_0 = matT_Z_rot(0, 0, 0, 0);
 	_T_Matrices.push_back(t_mat_base_to_joint_0);
 
 	Matrix* t_mat_joint_0_to_joint_1 = matT_Z_rot(0, LINK_LENGTH_1, 0, 0);
@@ -91,7 +92,7 @@ void PaintArm::rotate(int joint_index, double rotation_in_deg) {
 	}
 	
 	// I DON'T KNOW WHY I HAVE TO DO THIS BUT IT MAKES IT WORK
-	base_to_n[joint_index+1] = matT_base_to_joint_n(joint_index+1);
+	//base_to_n[joint_index+1] = matT_base_to_joint_n(joint_index+1);
 	// I DON'T KNOW WHY I HAVE TO DO THIS BUT IT MAKES IT WORK
 }
 
