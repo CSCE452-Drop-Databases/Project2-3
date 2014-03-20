@@ -17,12 +17,6 @@ int axis1Num = 0;
 int axis2Num = 0;
 int axis3Num = 0;
 
-
-
-
-
-
-
 Point paintArmAxisMidpoint(int axis1, int axis2) {
 	Matrix* paintArmAxis01 = paintArm.get_T_Matrix(0, axis1);
 	Matrix* paintArmAxis02 = paintArm.get_T_Matrix(0, axis2);
@@ -38,7 +32,6 @@ Point paintArmAxisMidpoint(int axis1, int axis2) {
 
 	return Point(midpointX, midpointY);
 }
-
 
 void ButtonsPressed(int x, int y) {
 	for (it_ButtonMap iterator = controlPanelButtons.begin(); iterator != controlPanelButtons.end(); iterator++) {
@@ -427,10 +420,48 @@ void colorGreenButtonCallback() {
 
 void worldXDecrementButtonCallback() {
 	printf("World X Decrement Button Pressed!\n");
+	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
+	double paintArmAxis03X = paintArmAxis03->get_elem(0, 3);
+	paintArmAxis03X -= 1;
+	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
+
+
+	int invkin = paintArm.calc_Inverse_Kinematics(paintArmAxis03X, paintArmAxis03Y);
+	if (invkin == 0) {
+		//it is reachable
+		axis1Num--;
+		resetPaintArm();
+		if (paintButtonMode) paintCircle();
+		paintRobotSleep(JOINT_SLEEP_TIME);
+	} else if (invkin == 1) {
+		//error
+		printf("Error: point not reachable:\n%d, %d\n", paintArmAxis03X, paintArmAxis03Y);
+	} else {
+		printf("Unknown Error: %i\n", invkin);
+	}
 }
 
 void worldXIncrementButtonCallback() {
 	printf("World X Increment Button Pressed!\n");
+	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
+	double paintArmAxis03X = paintArmAxis03->get_elem(0, 3);
+	paintArmAxis03X += 1;
+	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
+
+
+	int invkin = paintArm.calc_Inverse_Kinematics(paintArmAxis03X, paintArmAxis03Y);
+	if (invkin == 0) {
+		//it is reachable!
+		axis1Num++;
+		resetPaintArm();
+		if (paintButtonMode) paintCircle();
+		paintRobotSleep(JOINT_SLEEP_TIME);
+	} else if (invkin == 1) {
+		//error
+		printf("Error: point not reachable:\n%d, %d\n", paintArmAxis03X, paintArmAxis03Y);
+	} else {
+		printf("Unknown Error: %i\n", invkin);
+	}
 }
 
 void worldYDecrementButtonCallback() {
@@ -440,7 +471,6 @@ void worldYDecrementButtonCallback() {
 void worldYIncrementButtonCallback() {
 	printf("World Y Increment Button Pressed!\n");
 }
-
 
 /* Initialization Functions */
 // Init buttons in Joint Control Panel
