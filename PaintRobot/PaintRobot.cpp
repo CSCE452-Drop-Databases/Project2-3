@@ -3,7 +3,6 @@
 typedef std::map<char*, Button> ButtonMap;
 typedef ButtonMap::iterator it_ButtonMap;
 
-
 Mouse mouse = { 0, 0, 0, 0, 0 };
 
 PaintArm paintArm;
@@ -13,6 +12,7 @@ int instantPaint = 0; // for use with the macro paint buttons
 ButtonMap controlPanelButtons;
 std::vector<PaintCircle> paint;
 
+//TODO remove these when drawing works without hack
 int axis1Num = 0;
 int axis2Num = 0;
 int axis3Num = 0;
@@ -255,10 +255,8 @@ void draw() {
 	glFlush();
 }
 void paintCircle() {
-	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
-	double paintArmAxis03X = paintArmAxis03->get_elem(0, 3);
-	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
-	PaintCircle circle = { Point(paintArmAxis03X, paintArmAxis03Y), Color(paintBrushColor.r, paintBrushColor.g, paintBrushColor.b) };
+	Point endEffector = paintArm.getEndEffectorCoords();
+	PaintCircle circle = { endEffector, Color(paintBrushColor.r, paintBrushColor.g, paintBrushColor.b) };
 	paint.push_back(circle);
 }
 
@@ -470,6 +468,26 @@ void worldYDecrementButtonCallback() {
 
 void worldYIncrementButtonCallback() {
 	printf("World Y Increment Button Pressed!\n");
+}
+
+void changeEndEffector(double dx, double dy) {
+	Point endEffector = paintArm.getEndEffectorCoords();
+	double endPosX = endEffector.x + dx;
+	double endPosY = endEffector.y + dy;
+	int invkin = paintArm.calc_Inverse_Kinematics(endPosX, endPosY);
+
+	if (invkin == 0) {
+		//it is reachable!
+		//TODO update/redraw arm, don't reset it's position
+		resetPaintArm();
+		if (paintButtonMode) paintCircle();
+		paintRobotSleep(JOINT_SLEEP_TIME);
+	} else if (invkin == 1) {
+		//error
+		printf("Error: point not reachable:\n%d, %d\n", endPosX, endPosY);
+	} else {
+		printf("Unknown Error: %i\n", invkin);
+	}
 }
 
 /* Initialization Functions */

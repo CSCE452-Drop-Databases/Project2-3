@@ -11,7 +11,9 @@
 #include "stdafx.h"
 
 double deci_round(double in) {
-	return round(in * 1000000)/1000000;
+	return in;
+	//This method previously was used to truncated doubles to 6 digits
+	//TODO remove references to this function if it is no longer needed
 }
 
 PaintArm::PaintArm() {
@@ -48,7 +50,7 @@ PaintArm::~PaintArm() {
 
 double PaintArm::get_angle(int joint_index) {
 	if (joint_index >= num_of_joints) {
-		printf("ERROR :  PaintArm get_angle :: Invalid Index\n");
+		printf("ERROR :  PaintArm get_angle :: Invalid Index: %i\n", joint_index);
 		return 0;
 	}
 	double x = base_to_n[joint_index]->get_elem(0, 4);
@@ -57,6 +59,22 @@ double PaintArm::get_angle(int joint_index) {
 	return acos((pow(x, 2) + pow(h, 2) - pow(y, 2))/ (2*x*h));
 }
 
+Point PaintArm::getJointCoords(int joint_index) {
+	if (joint_index >= num_of_joints) {
+		printf("ERROR :  PaintArm getJointCoords :: Invalid Index: %i\n", joint_index);
+		//get_T_Matrix currently handles the error
+	}
+	Matrix* matrixT = get_T_Matrix(0, joint_index);
+	double joint_x = matrixT->get_elem(0, 3);
+	double joint_y = matrixT->get_elem(1, 3);
+	Point joint_coords(joint_x, joint_y);
+	return joint_coords;
+}
+
+Point PaintArm::getEndEffectorCoords() {
+	Point end_effector = getJointCoords(3);
+	return end_effector;
+}
 
 Matrix* PaintArm::get_T_Matrix(int start_index, int end_index) {
 	if (start_index > end_index || end_index >= base_to_n.size() || start_index < 0) {
@@ -106,7 +124,7 @@ void PaintArm::rotate(int joint_index, double rotation_in_deg) {
 	// I DON'T KNOW WHY I HAVE TO DO THIS BUT IT MAKES IT WORK
 }
 
-void PaintArm::translate(int joint_index, int x, int y) {
+void PaintArm::translate(int joint_index, double dx, double dy) {
 	if (joint_index >= num_of_joints) {
 		printf("ERROR :  PaintArm rotate :: Out of Bounds, joint_index\n");
 		return;
@@ -116,9 +134,9 @@ void PaintArm::translate(int joint_index, int x, int y) {
 		return;
 	}
 	double old_x = _T_Matrices[joint_index]->get_elem(0, 3);
-	_T_Matrices[joint_index]->assign_element(0, 3, (x + old_x));
+	_T_Matrices[joint_index]->assign_element(0, 3, (dx + old_x));
 	double old_y = _T_Matrices[joint_index]->get_elem(1, 3);
-	_T_Matrices[joint_index]->assign_element(1, 3, (y + old_y));
+	_T_Matrices[joint_index]->assign_element(1, 3, (dy + old_y));
 
 	for (int i = 0; i < base_to_n.size(); ++i) {
 		delete base_to_n[i];
@@ -170,7 +188,6 @@ Matrix* PaintArm::matT_base_to_joint_n(int n) {
 	return _t;
 }
 
-//Return 1 if outside reachable workspace
 int PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
 	double slide;
 	if(xpos<0) slide = 0;
@@ -210,6 +227,3 @@ int PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
 	_T_Matrices[3]->assign_element(1, 1, deci_round(cos(theta3)));
 	return 0;
 }
-
-
-

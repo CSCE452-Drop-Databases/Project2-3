@@ -1,6 +1,6 @@
 struct Point {
-	int x, y;
-	Point(int x, int y) : x(x), y(y) {}
+	double x, y;
+	Point(double x, double y) : x(x), y(y) {}
 };
 typedef struct Point Point;
 
