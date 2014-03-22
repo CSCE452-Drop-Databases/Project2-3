@@ -20,6 +20,7 @@ class PaintArm {
 		PaintArm();
 		~PaintArm();
 		Matrix* get_T_Matrix(int start_index, int end_index);
+		double PaintArm::get_angle(int joint);
 		void rotate(int joint_index, double rotation_in_deg);
 		void translate(int joint_index, int x, int y);
 		int PaintArm::calc_Inverse_Kinematics(double xpos, double ypos);

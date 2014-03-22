@@ -46,6 +46,17 @@ PaintArm::~PaintArm() {
 	}
 }
 
+double PaintArm::get_angle(int joint_index) {
+	if (joint_index >= num_of_joints) {
+		printf("ERROR :  PaintArm get_angle :: Invalid Index\n");
+		return 0;
+	}
+	double x = base_to_n[joint_index]->get_elem(0, 4);
+	double y = base_to_n[joint_index]->get_elem(1, 4);
+	double h = sqrt(pow(x, 2) + pow(y, 2));
+	return acos((pow(x, 2) + pow(h, 2) - pow(y, 2))/ (2*x*h));
+}
+
 
 Matrix* PaintArm::get_T_Matrix(int start_index, int end_index) {
 	if (start_index > end_index || end_index >= base_to_n.size() || start_index < 0) {
