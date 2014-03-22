@@ -416,60 +416,6 @@ void colorGreenButtonCallback() {
 	glutPostRedisplay();
 }
 
-void worldXDecrementButtonCallback() {
-	printf("World X Decrement Button Pressed!\n");
-	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
-	double paintArmAxis03X = paintArmAxis03->get_elem(0, 3);
-	paintArmAxis03X -= 1;
-	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
-
-
-	int invkin = paintArm.calc_Inverse_Kinematics(paintArmAxis03X, paintArmAxis03Y);
-	if (invkin == 0) {
-		//it is reachable
-		axis1Num--;
-		resetPaintArm();
-		if (paintButtonMode) paintCircle();
-		paintRobotSleep(JOINT_SLEEP_TIME);
-	} else if (invkin == 1) {
-		//error
-		printf("Error: point not reachable:\n%d, %d\n", paintArmAxis03X, paintArmAxis03Y);
-	} else {
-		printf("Unknown Error: %i\n", invkin);
-	}
-}
-
-void worldXIncrementButtonCallback() {
-	printf("World X Increment Button Pressed!\n");
-	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
-	double paintArmAxis03X = paintArmAxis03->get_elem(0, 3);
-	paintArmAxis03X += 1;
-	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
-
-
-	int invkin = paintArm.calc_Inverse_Kinematics(paintArmAxis03X, paintArmAxis03Y);
-	if (invkin == 0) {
-		//it is reachable!
-		axis1Num++;
-		resetPaintArm();
-		if (paintButtonMode) paintCircle();
-		paintRobotSleep(JOINT_SLEEP_TIME);
-	} else if (invkin == 1) {
-		//error
-		printf("Error: point not reachable:\n%d, %d\n", paintArmAxis03X, paintArmAxis03Y);
-	} else {
-		printf("Unknown Error: %i\n", invkin);
-	}
-}
-
-void worldYDecrementButtonCallback() {
-	printf("World Y Decrement Button Pressed!\n");
-}
-
-void worldYIncrementButtonCallback() {
-	printf("World Y Increment Button Pressed!\n");
-}
-
 void changeEndEffector(double dx, double dy) {
 	Point endEffector = paintArm.getEndEffectorCoords();
 	double endPosX = endEffector.x + dx;
@@ -488,6 +434,26 @@ void changeEndEffector(double dx, double dy) {
 	} else {
 		printf("Unknown Error: %i\n", invkin);
 	}
+}
+
+void worldXDecrementButtonCallback() {
+	printf("World X Decrement Button Pressed!\n");
+	changeEndEffector(-1, 0);
+}
+
+void worldXIncrementButtonCallback() {
+	printf("World X Increment Button Pressed!\n");
+	changeEndEffector(1, 0);
+}
+
+void worldYDecrementButtonCallback() {
+	printf("World Y Decrement Button Pressed!\n");
+	changeEndEffector(0, -1);
+}
+
+void worldYIncrementButtonCallback() {
+	printf("World Y Increment Button Pressed!\n");
+	changeEndEffector(0, 1);
 }
 
 /* Initialization Functions */
