@@ -212,7 +212,7 @@ int PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
 	theta2 = Phi1 - Phi2;
 
 	
-	_T_Matrices[0]->assign_element(0, 3, (slide));
+	_T_Matrices[1]->assign_element(0, 3, (slide));
 
 	_T_Matrices[2]->assign_element(0, 0, deci_round(cos(theta2)));
 	_T_Matrices[3]->assign_element(0, 0, deci_round(cos(theta3)));
@@ -225,5 +225,8 @@ int PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
 
 	_T_Matrices[2]->assign_element(1, 1, deci_round(cos(theta2)));
 	_T_Matrices[3]->assign_element(1, 1, deci_round(cos(theta3)));
+	base_to_n[1] = _T_Matrices[0]->multiply(_T_Matrices[1]);
+	base_to_n[2] = base_to_n[1]->multiply(_T_Matrices[2]);
+	base_to_n[3] = base_to_n[2]->multiply(_T_Matrices[3]);
 	return 0;
 }
