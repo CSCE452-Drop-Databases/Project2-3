@@ -39,5 +39,11 @@ public:
 
 	// send data to all clients
 	void sendToAll(char * packets, int totalSize);
+
+	void close() { 
+		closesocket(ListenSocket);
+		closesocket(ClientSocket);
+		printf("Server has closed!!!\n");
+	}
 };
 

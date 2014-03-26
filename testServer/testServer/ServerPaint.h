@@ -12,6 +12,7 @@ public:
 	void update();
 	void receiveFromClients();
 	void sendActionPackets();
+	void close() { network->close(); }
 
 private:
 

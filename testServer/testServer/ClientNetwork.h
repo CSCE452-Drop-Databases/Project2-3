@@ -31,5 +31,10 @@ public:
 	~ClientNetwork(void);
 
 	int receivePackets(char *);
+
+	void close() { 
+		closesocket(ConnectSocket);
+		printf("Client has closed!!!\n");
+	}
 };
 

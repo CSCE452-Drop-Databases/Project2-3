@@ -28,18 +28,32 @@ int main()
 
 void serverLoop(void * arg)
 {
+	int i = 0;
 	while (true)
 	{
+		if (i == 20000){
+			server->close();
+			client->close();
+			break;
+		}
 		server->update();
+		++i;
 	}
 }
 
 void clientLoop()
 {
+	int i = 0;
 	while (true)
 	{
+		if (i == 20000){
+			client->close();
+			server->close();
+			break;
+		}
 		//do game stuff
 		client->update();
+		++i;
 	}
 }
 
