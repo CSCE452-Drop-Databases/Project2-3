@@ -80,6 +80,7 @@
   <ItemGroup>
     <ClInclude Include="ClientNetwork.h" />
     <ClInclude Include="ClientPaint.h" />
+    <ClInclude Include="NetworkData.h" />
     <ClInclude Include="NetworkService.h" />
     <ClInclude Include="ServerNetwork.h" />
     <ClInclude Include="ServerPaint.h" />

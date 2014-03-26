@@ -1,4 +1,5 @@
 #include "ServerNetwork.h"
+#include "NetworkData.h"
 
 class ServerPaint
 {
@@ -9,6 +10,8 @@ public:
 	~ServerPaint(void);
 
 	void update();
+	void receiveFromClients();
+	void sendActionPackets();
 
 private:
 
@@ -17,4 +20,7 @@ private:
 
 	// The ServerNetwork object 
 	ServerNetwork* network;
+
+	// data buffer
+	char network_data[MAX_PACKET_SIZE];
 };

@@ -1,6 +1,7 @@
 #include <winsock2.h>
 #include <Windows.h>
 #include "NetworkService.h"
+#include "NetworkData.h"
 #include <ws2tcpip.h>
 #include <map>
 using namespace std;
@@ -32,5 +33,11 @@ public:
 
 	// accept new connections
 	bool acceptNewClient(unsigned int & id);
+
+	// receive incoming data
+	int receiveData(unsigned int client_id, char * recvbuf);
+
+	// send data to all clients
+	void sendToAll(char * packets, int totalSize);
 };
 
