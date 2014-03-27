@@ -200,7 +200,7 @@ Matrix* PaintArm::matT_base_to_joint_n(int n) {
 	}
 	return _t;
 }
-
+/*
 int PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
 	//std::cout << "inverseKinematics: (" << xpos << ", " << ypos << ")" << std::endl;
 	double slide;
@@ -210,27 +210,17 @@ int PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
 	double theta1_deg = 90;
 	double theta2;
 	
-	//Shortcut: if Y isn't changing, we can just translate
-	Point current_pos = getEndEffectorCoords();
-	if (ypos == current_pos.y) {
-		//get diff in x
-		double dx = xpos - current_pos.x;
-
-		//translate
-		translate(0, -dx, 0);
-
-		return 0;
-	}
+	
 	
 	//Check if we are outside reachable workspace by making sure both of the triangles we are using to calculate angles are non-degenerate
 	if((sqrt((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1)) > (LINK_LENGTH_2 + LINK_LENGTH_3)) || (sqrt((xpos - slide)*(xpos - slide) - (ypos)*(ypos)) > (LINK_LENGTH_1 + (sqrt((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1)))))) return 1;
 	
 	//Theta3 = cos^-1((-(X3 - X0)^2 - (Y3 - L0)^2 + L3^2 + L2^2) / (L3 * L2))
-	double theta3 = acos((-(xpos - slide)*(xpos - slide) - (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1) + LINK_LENGTH_2*LINK_LENGTH_2 + LINK_LENGTH_3*LINK_LENGTH_3) / (2 * LINK_LENGTH_2*LINK_LENGTH_3));
+	//double theta3 = acos((-(xpos - slide)*(xpos - slide) - (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1) + LINK_LENGTH_2*LINK_LENGTH_2 + LINK_LENGTH_3*LINK_LENGTH_3) / (2 * LINK_LENGTH_2*LINK_LENGTH_3));
 	//Phi2 = cos^-1(((X3 - X0)^2 + (Y3 - L0)^2 - L3^2 + L2^2) / (sqrt((X3 - X0)^2 + (Y3 - L0)^2) * L2))
-	double Phi2 = acos(((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1) + LINK_LENGTH_2*LINK_LENGTH_2 - LINK_LENGTH_3*LINK_LENGTH_3) / (2 * LINK_LENGTH_2 * sqrt((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1))));
+	//double Phi2 = acos(((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1) + LINK_LENGTH_2*LINK_LENGTH_2 - LINK_LENGTH_3*LINK_LENGTH_3) / (2 * LINK_LENGTH_2 * sqrt((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1))));
 	//Phi1 = cos^-1(((X3 - X0)^2 + (Y3 - L0)^2 +L1^2  - (X3 - X0)^2 - (Y3)^2) / (2sqrt((X3 - X0)^2 + (Y3 - L0)^2) * L1))
-	double Phi1 = acos(((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1) + LINK_LENGTH_1*LINK_LENGTH_1 - (xpos - slide)*(xpos - slide) - (ypos)*(ypos)) / (2 * LINK_LENGTH_1 * sqrt((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1))));
+	//double Phi1 = acos(((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1) + LINK_LENGTH_1*LINK_LENGTH_1 - (xpos - slide)*(xpos - slide) - (ypos)*(ypos)) / (2 * LINK_LENGTH_1 * sqrt((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1))));
 	theta2 = Phi1 - Phi2;
 	
 	_T_Matrices[1]->assign_element(0, 3, (slide));
@@ -257,6 +247,40 @@ int PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
 
 	deg1 = theta2_deg;
 	deg2 = theta3_deg;
+
+	return 0;
+}
+*/
+
+int PaintArm::calc_Inverse_Kinematics(double xpos, double ypos) {
+	//Shortcut: if Y isn't changing, we can just translate
+	Point current_pos = getEndEffectorCoords();
+	if (ypos == current_pos.y) {
+		//get diff in x
+		double dx = xpos - current_pos.x;
+
+		//translate
+		translate(0, -dx, 0);
+
+		return 0;
+	}
+	double h = sqrt(pow(xpos, 2)+pow(ypos, 2));
+	Point j1 = getJointCoords(1);
+	Point j2 = getJointCoords(2);
+	double l = sqrt(pow((xpos - j1.x), 2) + pow((ypos - j1.y), 2));
+	double L = acos((pow(l, 2) - 10000 - 5625)/ (-7500));
+	double A = acos((5625 - pow(l, 2) - 10000 )/ (-100 * l));
+	double B = acos((pow(h, 2) - pow(l, 2) - 22500) / (-150 * l));
+
+	double theta2 = L;
+	double theta3 = A + B;
+	printf("h, l, L, A, B, theta2, theta3:\n\t%d, %d, %d, %d, %d, %d, %d\n", h, l, L, A, B, theta2, theta3);
+
+
+	Point p = Point(theta2, theta3);
+
+	deg1 = theta3 * 180.0 / 3.14159265;
+	deg2 = theta2 * 180.0 / 3.14159265;
 
 	return 0;
 }

@@ -69,7 +69,15 @@ std::string processWorld(std::string data) {
 	double endPosX = endEffector.x + dx;
 	double endPosY = endEffector.y + dy;
 	int invkin = paintArm.calc_Inverse_Kinematics(endPosX, endPosY);
-	
+	double deg1 = paintArm.deg1;
+	double deg2 = paintArm.deg2;
+
+
+	//paintArm = (*new PaintArm());
+	//paintArm.rotate(1, deg1);
+	//paintArm.rotate(2, deg2);
+
+
 	if (invkin == 0) {
 		//it is reachable!
 		response = '1';
