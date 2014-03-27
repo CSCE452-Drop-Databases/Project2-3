@@ -210,12 +210,20 @@ int PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
 	double theta1_deg = 90;
 	double theta2;
 	
+	//Shortcut: if Y isn't changing, we can just translate
+	Point current_pos = getEndEffectorCoords();
+	if (ypos == current_pos.y) {
+		//get diff in x
+		double dx = xpos - current_pos.x;
+
+		//translate
+		translate(0, -dx, 0);
+
+		return 0;
+	}
+	
 	//Check if we are outside reachable workspace by making sure both of the triangles we are using to calculate angles are non-degenerate
 	if((sqrt((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1)) > (LINK_LENGTH_2 + LINK_LENGTH_3)) || (sqrt((xpos - slide)*(xpos - slide) - (ypos)*(ypos)) > (LINK_LENGTH_1 + (sqrt((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1)))))) return 1;
-	
-	
-	
-	
 	
 	//Theta3 = cos^-1((-(X3 - X0)^2 - (Y3 - L0)^2 + L3^2 + L2^2) / (L3 * L2))
 	double theta3 = acos((-(xpos - slide)*(xpos - slide) - (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1) + LINK_LENGTH_2*LINK_LENGTH_2 + LINK_LENGTH_3*LINK_LENGTH_3) / (2 * LINK_LENGTH_2*LINK_LENGTH_3));
