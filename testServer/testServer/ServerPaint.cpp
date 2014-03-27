@@ -12,7 +12,7 @@ ServerPaint::ServerPaint(void)
 	network = new ServerNetwork();
 }
 
-void ServerPaint::update()
+Packet ServerPaint::update()
 {
 
 	// get new clients
@@ -22,13 +22,14 @@ void ServerPaint::update()
 
 		client_id++;
 	}
-	receiveFromClients();
+	return receiveFromClients();
 }
 
 
 //modify this for different messages
-void ServerPaint::receiveFromClients()
+Packet ServerPaint::receiveFromClients()
 {
+	//TODO return the packet object from function
 
 	Packet packet;
 
@@ -51,22 +52,32 @@ void ServerPaint::receiveFromClients()
 			packet.deserialize(&(network_data[i]));
 			i += sizeof(Packet);
 
+			Packet pak;
+
 			switch (packet.packet_type) {
 
 			case INIT_CONNECTION:
 
 				printf("server received init packet from client\n");
 
-				sendActionPackets();
-
+				//sendActionPackets();
+				//Packet pak;
+				pak.packet_type = ACTION_EVENT;
+				pak.contents = 'B';
+				sendPacket(pak);
+				return packet;
 				break;
 
 			case ACTION_EVENT:
 
-				printf("server received action event packet from client\n");
+				printf("server received action event packet from client: %c\n", packet.contents);
 
-				sendActionPackets();
-
+				//sendActionPackets();
+				//Packet pak;
+				pak.packet_type = ACTION_EVENT;
+				pak.contents = 'B';
+				sendPacket(pak);
+				return packet;
 				break;
 
 			default:
@@ -77,6 +88,9 @@ void ServerPaint::receiveFromClients()
 			}
 		}
 	}
+	
+	//ready or not, we must return something!
+	return packet;
 }
 
 void ServerPaint::sendActionPackets()
@@ -88,8 +102,17 @@ void ServerPaint::sendActionPackets()
 	Packet packet;
 	packet.packet_type = ACTION_EVENT;
 
+	packet.contents = 'B';
 	packet.serialize(packet_data);
 
 	network->sendToAll(packet_data, packet_size);
 }
 
+void ServerPaint::sendPacket(Packet _packet) {
+	const unsigned int packet_size = sizeof(Packet);
+	char packet_data[packet_size];
+
+	_packet.serialize(packet_data);
+
+	network->sendToAll(packet_data, packet_size);
+}

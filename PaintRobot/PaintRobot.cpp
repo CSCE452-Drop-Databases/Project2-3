@@ -438,22 +438,22 @@ void changeEndEffector(double dx, double dy) {
 
 void worldXDecrementButtonCallback() {
 	printf("World X Decrement Button Pressed!\n");
-	changeEndEffector(-1, 0);
+	changeEndEffector(-1.0, 0.0);
 }
 
 void worldXIncrementButtonCallback() {
 	printf("World X Increment Button Pressed!\n");
-	changeEndEffector(1, 0);
+	changeEndEffector(1.0, 0.0);
 }
 
 void worldYDecrementButtonCallback() {
 	printf("World Y Decrement Button Pressed!\n");
-	changeEndEffector(0, -1);
+	changeEndEffector(0.0, -1.0);
 }
 
 void worldYIncrementButtonCallback() {
 	printf("World Y Increment Button Pressed!\n");
-	changeEndEffector(0, 1);
+	changeEndEffector(0.0, 1.0);
 }
 
 /* Initialization Functions */

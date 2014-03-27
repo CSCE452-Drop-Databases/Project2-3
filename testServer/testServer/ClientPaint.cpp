@@ -27,12 +27,22 @@ void ClientPaint::sendActionPackets()
 	Packet packet;
 	packet.packet_type = ACTION_EVENT;
 
+	packet.contents = 'A';
 	packet.serialize(packet_data);
 
 	NetworkServices::sendMessage(network->ConnectSocket, packet_data, packet_size);
 }
 
-void ClientPaint::update()
+void ClientPaint::sendPacket(Packet _packet) {
+	const unsigned int packet_size = sizeof(Packet);
+	char packet_data[packet_size];
+
+	_packet.serialize(packet_data);
+
+	NetworkServices::sendMessage(network->ConnectSocket, packet_data, packet_size);
+}
+
+Packet ClientPaint::update()
 {
 	Packet packet;
 	int data_length = network->receivePackets(network_data);
@@ -53,9 +63,10 @@ void ClientPaint::update()
 
 		case ACTION_EVENT:
 
-			printf("client received action event packet from server\n");
+			printf("client received action event packet from server: %c\n", packet.contents);
 
 			sendActionPackets();
+			return packet;
 
 			break;
 
@@ -66,5 +77,8 @@ void ClientPaint::update()
 			break;
 		}
 	}
+	
+	//ready or not, we must return something!
+	return packet;
 }
 

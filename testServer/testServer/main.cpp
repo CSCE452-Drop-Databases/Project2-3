@@ -24,6 +24,8 @@ int main()
 	client = new ClientPaint();
 
 	clientLoop();
+
+	for (;;);
 }
 
 void serverLoop(void * arg)

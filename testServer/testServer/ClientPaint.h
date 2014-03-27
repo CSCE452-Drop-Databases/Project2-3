@@ -15,9 +15,13 @@ public:
 
 	void sendActionPackets();
 
+	//Customize your packet before passing it to this
+	void sendPacket(Packet _packet);
+
 	char network_data[MAX_PACKET_SIZE];
 
-	void update();
+	//This should return a packet containing the latest information
+	Packet update();
 
 	void close() { network->close(); }
 };

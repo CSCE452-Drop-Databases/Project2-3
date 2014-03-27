@@ -9,9 +9,12 @@ public:
 	ServerPaint(void);
 	~ServerPaint(void);
 
-	void update();
-	void receiveFromClients();
+	Packet update();
+	Packet receiveFromClients();
 	void sendActionPackets();
+
+	//Customize your packet before passing it to this
+	void sendPacket(Packet _packet);
 	void close() { network->close(); }
 
 private:

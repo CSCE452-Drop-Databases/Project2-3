@@ -1,4 +1,4 @@
-#include <string.h>
+#include <string>
 
 #ifndef _packet_types_
 #define _packet_types_
@@ -16,6 +16,13 @@ enum PacketTypes {
 struct Packet {
 
 	unsigned int packet_type;
+
+	//these two are just here to see what works
+	char contents;
+	double many_vals[30];
+
+	//TODO when this is a part of the main code, have packets contain PaintArm objects
+	//This will allow all relevant info to transfer in one go
 
 	void serialize(char * data) {
 		memcpy(data, this, sizeof(Packet));
