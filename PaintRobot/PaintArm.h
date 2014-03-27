@@ -20,6 +20,9 @@ class PaintArm {
 		PaintArm();
 		~PaintArm();
 		
+		double deg1;
+		double deg2;
+
 		//Returns the Transformation matrix if successful
 		//Returns the Identity matrix if there was an error
 		Matrix* get_T_Matrix(int start_index, int end_index);

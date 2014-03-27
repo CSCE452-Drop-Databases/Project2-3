@@ -37,6 +37,9 @@ PaintArm::PaintArm() {
 	for (int i = 0; i <= num_of_joints; ++i) {
 		base_to_n.push_back(matT_base_to_joint_n(i));
 	}
+
+	deg1 = 0;
+	deg2 = 0;
 }
 
 PaintArm::~PaintArm() {
@@ -67,12 +70,14 @@ Point PaintArm::getJointCoords(int joint_index) {
 	Matrix* matrixT = get_T_Matrix(0, joint_index);
 	double joint_x = matrixT->get_elem(0, 3);
 	double joint_y = matrixT->get_elem(1, 3);
+	printf("Joint %d at (%d, %d)\n", joint_index, joint_x, joint_y);
 	Point joint_coords(joint_x, joint_y);
 	return joint_coords;
 }
 
 Point PaintArm::getEndEffectorCoords() {
 	Point end_effector = getJointCoords(3);
+	printf("End Effector at (%d, %d)\n", end_effector.x, end_effector.y);
 	return end_effector;
 }
 
@@ -100,6 +105,14 @@ void PaintArm::rotate(int joint_index, double rotation_in_deg) {
 		printf("ERROR :  PaintArm rotate :: Do not rotate base please\n");
 		return;
 	}*/
+
+	if (joint_index == 1) {
+		deg1 += rotation_in_deg;
+	}
+	else if (joint_index == 2) {
+		deg2 += rotation_in_deg;
+	}
+
 	double theta_in_rads = (rotation_in_deg*DEG_TO_RADS);
 	double a_00 = _T_Matrices[joint_index]->get_elem(0, 0);
 	_T_Matrices[joint_index]->assign_element(0, 0, deci_round(cos(acos(a_00) + theta_in_rads)));
@@ -210,7 +223,6 @@ int PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
 	//Phi1 = cos^-1(((X3 - X0)^2 + (Y3 - L0)^2 +L1^2  - (X3 - X0)^2 - (Y3)^2) / (2sqrt((X3 - X0)^2 + (Y3 - L0)^2) * L1))
 	double Phi1 = acos(((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1) + LINK_LENGTH_1*LINK_LENGTH_1 - (xpos - slide)*(xpos - slide) - (ypos)*(ypos)) / (2 * LINK_LENGTH_1 * sqrt((xpos - slide)*(xpos - slide) + (ypos - LINK_LENGTH_1)*(ypos - LINK_LENGTH_1))));
 	theta2 = Phi1 - Phi2;
-
 	
 	_T_Matrices[1]->assign_element(0, 3, (slide));
 
@@ -228,5 +240,11 @@ int PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
 	base_to_n[1] = _T_Matrices[0]->multiply(_T_Matrices[1]);
 	base_to_n[2] = base_to_n[1]->multiply(_T_Matrices[2]);
 	base_to_n[3] = base_to_n[2]->multiply(_T_Matrices[3]);
+
+
+	double theta2_deg = theta2 * 180.0 / 3.14159265;
+	double theta3_deg = theta3 * 180.0 / 3.14159265;
+	std::cout << "Theta2: " << theta2_deg << " | Theta3: " << theta3_deg << std::endl;
+
 	return 0;
 }
