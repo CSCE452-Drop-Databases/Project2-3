@@ -776,6 +776,9 @@ int main(int argc, char **argv)
 	//glutMainLoop();
 
 
+	std::string addr;
+	std::cout << "Enter server address: ";
+	std::cin >> addr;
 
 
 	WSADATA wsaData;
@@ -785,13 +788,6 @@ int main(int argc, char **argv)
 		hints;
 	char *sendbuf = "this is a test";
 	
-
-	// Validate the parameters
-	if (argc != 2) {
-		//printf("usage: %s server-name\n", argv[0]);
-		//return 1;
-		argv[1] = "127.0.0.1";
-	}
 
 	// Initialize Winsock
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -806,7 +802,7 @@ int main(int argc, char **argv)
 	hints.ai_protocol = IPPROTO_TCP;
 
 	// Resolve the server address and port
-	iResult = getaddrinfo(argv[1], DEFAULT_PORT, &hints, &result);
+	iResult = getaddrinfo(addr.c_str(), DEFAULT_PORT, &hints, &result);
 	if (iResult != 0) {
 		printf("getaddrinfo failed with error: %d\n", iResult);
 		WSACleanup();
