@@ -30,6 +30,10 @@ int main()
 
 void serverLoop(void * arg)
 {
+	Packet pak;
+	pak.packet_type = ACTION_EVENT;
+	pak.contents = 'X';
+
 	int i = 0;
 	while (true)
 	{
@@ -38,13 +42,17 @@ void serverLoop(void * arg)
 			client->close();
 			break;
 		}
-		server->update();
+		server->update(pak);
 		++i;
 	}
 }
 
 void clientLoop()
 {
+	Packet pak;
+	pak.packet_type = ACTION_EVENT;
+	pak.contents = 'Y';
+
 	int i = 0;
 	while (true)
 	{
@@ -54,7 +62,7 @@ void clientLoop()
 			break;
 		}
 		//do game stuff
-		client->update();
+		client->update(pak);
 		++i;
 	}
 }

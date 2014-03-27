@@ -9,8 +9,8 @@ public:
 	ServerPaint(void);
 	~ServerPaint(void);
 
-	Packet update();
-	Packet receiveFromClients();
+	Packet update(Packet _outgoing_packet);
+	Packet receiveFromClients(Packet _outgoing_packet);
 	void sendActionPackets();
 
 	//Customize your packet before passing it to this

@@ -42,7 +42,7 @@ void ClientPaint::sendPacket(Packet _packet) {
 	NetworkServices::sendMessage(network->ConnectSocket, packet_data, packet_size);
 }
 
-Packet ClientPaint::update()
+Packet ClientPaint::update(Packet _outgoing_packet)
 {
 	Packet packet;
 	int data_length = network->receivePackets(network_data);
@@ -50,7 +50,8 @@ Packet ClientPaint::update()
 	if (data_length <= 0)
 	{
 		//no data recieved
-		return;
+		packet.packet_type = PACKET_ERROR;
+		return packet;
 	}
 
 	int i = 0;
@@ -65,7 +66,8 @@ Packet ClientPaint::update()
 
 			printf("client received action event packet from server: %c\n", packet.contents);
 
-			sendActionPackets();
+			//sendActionPackets();
+			sendPacket(_outgoing_packet);
 			return packet;
 
 			break;

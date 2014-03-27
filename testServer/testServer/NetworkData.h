@@ -7,9 +7,11 @@
 
 enum PacketTypes {
 
-	INIT_CONNECTION = 0,
+	PACKET_ERROR = 0,
+	
+	INIT_CONNECTION = 1,
 
-	ACTION_EVENT = 1,
+	ACTION_EVENT = 2,
 
 };
 

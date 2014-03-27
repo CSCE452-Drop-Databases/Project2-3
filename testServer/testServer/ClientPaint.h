@@ -21,7 +21,7 @@ public:
 	char network_data[MAX_PACKET_SIZE];
 
 	//This should return a packet containing the latest information
-	Packet update();
+	Packet update(Packet _outgoing_packet);
 
 	void close() { network->close(); }
 };

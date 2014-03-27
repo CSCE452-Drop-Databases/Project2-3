@@ -12,7 +12,7 @@ ServerPaint::ServerPaint(void)
 	network = new ServerNetwork();
 }
 
-Packet ServerPaint::update()
+Packet ServerPaint::update(Packet _outgoing_packet)
 {
 
 	// get new clients
@@ -22,12 +22,12 @@ Packet ServerPaint::update()
 
 		client_id++;
 	}
-	return receiveFromClients();
+	return receiveFromClients(_outgoing_packet);
 }
 
 
 //modify this for different messages
-Packet ServerPaint::receiveFromClients()
+Packet ServerPaint::receiveFromClients(Packet _outgoing_packet)
 {
 	//TODO return the packet object from function
 
@@ -61,10 +61,9 @@ Packet ServerPaint::receiveFromClients()
 				printf("server received init packet from client\n");
 
 				//sendActionPackets();
-				//Packet pak;
-				pak.packet_type = ACTION_EVENT;
-				pak.contents = 'B';
-				sendPacket(pak);
+				//pak.packet_type = ACTION_EVENT;
+				//pak.contents = 'B';
+				sendPacket(_outgoing_packet);
 				return packet;
 				break;
 
@@ -73,10 +72,9 @@ Packet ServerPaint::receiveFromClients()
 				printf("server received action event packet from client: %c\n", packet.contents);
 
 				//sendActionPackets();
-				//Packet pak;
-				pak.packet_type = ACTION_EVENT;
-				pak.contents = 'B';
-				sendPacket(pak);
+				//pak.packet_type = ACTION_EVENT;
+				//pak.contents = 'B';
+				sendPacket(_outgoing_packet);
 				return packet;
 				break;
 
@@ -90,6 +88,7 @@ Packet ServerPaint::receiveFromClients()
 	}
 	
 	//ready or not, we must return something!
+	packet.packet_type = PACKET_ERROR;
 	return packet;
 }
 
