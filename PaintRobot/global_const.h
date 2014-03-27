@@ -19,6 +19,7 @@ char* const cpjAxis3Title = "Axis 3";
 char* const cpjPaintBrushTitle = "Paint Brush";
 char* const cpjClearTitle = "Clear and Reset";
 char* const cpjColorTitle = "Colors";
+char* const cpjDelayTitle = "Server Delay";
 
 // Control Panel World Section Titles
 char* const cpwTitle = "Control Panel - World";
@@ -60,21 +61,21 @@ int const slidePosY = SLIDE_LOCATION_PERCENT * robotAreaHeight;
 
 
 // Matrix constants
-int const DEFAULT_MATRIX_SIZE = 4;
-
-double const DEG_TO_RADS = 3.14159265 / 180.0;
-
-int const MATRIX_VALUE_ONE = 1;
-int const MATRIX_VALUE_ZERO = 0;
-
-int const LINK_LENGTH_1 = 150;
-int const LINK_LENGTH_2 = 100;
-int const LINK_LENGTH_3 = 75;
-
-int const ROTATE_AMOUNT = 1;
-int const SLIDE_AMOUNT = 1;
-
-int const LINK_WIDTH = 20;
+//int const DEFAULT_MATRIX_SIZE = 4;
+//
+//double const DEG_TO_RADS = 3.14159265 / 180.0;
+//
+//int const MATRIX_VALUE_ONE = 1;
+//int const MATRIX_VALUE_ZERO = 0;
+//
+//int const LINK_LENGTH_1 = 150;
+//int const LINK_LENGTH_2 = 100;
+//int const LINK_LENGTH_3 = 75;
+//
+//int const ROTATE_AMOUNT = 1;
+//int const SLIDE_AMOUNT = 1;
+//
+//int const LINK_WIDTH = 20;
 
 int const PAINT_CIRCLE_RADIUS = 10;
 

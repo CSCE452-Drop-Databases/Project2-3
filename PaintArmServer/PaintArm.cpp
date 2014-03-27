@@ -202,6 +202,7 @@ Matrix* PaintArm::matT_base_to_joint_n(int n) {
 }
 
 int PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
+	//std::cout << "inverseKinematics: (" << xpos << ", " << ypos << ")" << std::endl;
 	double slide;
 	if(xpos<0) slide = 0;
 	else if (xpos < SLIDE_LENGTH) slide = xpos;
@@ -245,6 +246,9 @@ int PaintArm::calc_Inverse_Kinematics(double xpos, double ypos){
 	double theta2_deg = theta2 * 180.0 / 3.14159265;
 	double theta3_deg = theta3 * 180.0 / 3.14159265;
 	std::cout << "Theta2: " << theta2_deg << " | Theta3: " << theta3_deg << std::endl;
+
+	deg1 = theta2_deg;
+	deg2 = theta3_deg;
 
 	return 0;
 }

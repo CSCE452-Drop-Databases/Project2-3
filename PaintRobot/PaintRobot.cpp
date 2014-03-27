@@ -1,36 +1,83 @@
 #include "stdafx.h"
 
+
+// Need to link with Ws2_32.lib
+#pragma comment (lib, "Ws2_32.lib")
+// #pragma comment (lib, "Mswsock.lib")
+
+// Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
+#pragma comment (lib, "Ws2_32.lib")
+#pragma comment (lib, "Mswsock.lib")
+#pragma comment (lib, "AdvApi32.lib")
+
+
+#define DEFAULT_BUFLEN 512
+#define DEFAULT_PORT "27015"
+
+SOCKET ConnectSocket = INVALID_SOCKET;
+char recvbuf[DEFAULT_BUFLEN];
+int iResult;
+int recvbuflen = DEFAULT_BUFLEN;
+
+
+
+
+
+
 typedef std::map<char*, Button> ButtonMap;
 typedef ButtonMap::iterator it_ButtonMap;
 
 Mouse mouse = { 0, 0, 0, 0, 0 };
 
-PaintArm paintArm;
+//PaintArm paintArm;
 Color paintBrushColor = Color(1.0f, 1.0f, 1.0f);
 int paintButtonMode = 0;
+int delayButtonMode = 0;
 int instantPaint = 0; // for use with the macro paint buttons
 ButtonMap controlPanelButtons;
 std::vector<PaintCircle> paint;
 
-//TODO remove these when drawing works without hack
-int axis1Num = 0;
-int axis2Num = 0;
-int axis3Num = 0;
 
-Point paintArmAxisMidpoint(int axis1, int axis2) {
-	Matrix* paintArmAxis01 = paintArm.get_T_Matrix(0, axis1);
-	Matrix* paintArmAxis02 = paintArm.get_T_Matrix(0, axis2);
 
-	double paintArmAxis01X = paintArmAxis01->get_elem(0, 3);
-	double paintArmAxis01Y = paintArmAxis01->get_elem(1, 3);
+std::string sendData(std::string data) {
+	// send data
+	send(ConnectSocket, data.c_str(), (int)strlen(data.c_str()), 0);
+	// wait for response
+	int iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+	std::string temp = "";
+	for (int i = 0; i < iResult; ++i) {
+		//std::cout << temp << std::endl;
+		temp += recvbuf[i];
+	}
+	if (delayButtonMode) paintRobotSleep(2000);
+	return temp;
+}
 
-	double paintArmAxis02X = paintArmAxis02->get_elem(0, 3);
-	double paintArmAxis02Y = paintArmAxis02->get_elem(1, 3);
 
-	double midpointX = (paintArmAxis01X + paintArmAxis02X) / 2;
-	double midpointY = (paintArmAxis01Y + paintArmAxis02Y) / 2;
+Point processJointCoord(std::string data) {
+	int x, y;
+	char c;
+	std::stringstream ss(data);
+	ss >> x;
+	ss >> c;
+	ss >> y;
+	//std::cout << "Processed Joint Coord (" << x << ", " << y << ")" << std::endl;
+	Point p(x, y);
+	return p;
+}
 
-	return Point(midpointX, midpointY);
+Point getJointCoord(int index) {
+	std::string sendbuf = "g" + std::to_string(index);
+	send(ConnectSocket, sendbuf.c_str(), (int)strlen(sendbuf.c_str()), 0);
+
+	int iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+	std::string temp = "";
+	for (int i = 0; i < iResult; ++i) {
+		//std::cout << temp << std::endl;
+		temp += recvbuf[i];
+	}
+	std::cout << "Received: " << temp << std::endl;
+	return processJointCoord(temp);
 }
 
 void ButtonsPressed(int x, int y) {
@@ -49,32 +96,6 @@ void ButtonsPassive(int x, int y) {
 	for (it_ButtonMap iterator = controlPanelButtons.begin(); iterator != controlPanelButtons.end(); iterator++) {
 		ButtonPassive(&iterator->second, x, y);
 	}
-}
-
-void resetPaintArm() {
-
-	Matrix* paintArmAxis00 = paintArm.get_T_Matrix(0, 0);
-	Matrix* paintArmAxis01 = paintArm.get_T_Matrix(0, 1);
-	Matrix* paintArmAxis02 = paintArm.get_T_Matrix(0, 2);
-	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
-
-	double amtT = paintArmAxis00->get_elem(0, 3);
-	std::cout << "amtT = " << amtT << std::endl;
-
-	double deg1 = paintArm.deg1;//paintArm.get_angle(1);
-	std::cout << "deg1 = " << deg1 << std::endl;
-
-	double deg2 = paintArm.deg2;//paintArm.get_angle(2);
-	std::cout << "deg2 = " << deg2 << std::endl;
-
-	paintArm = (*new PaintArm());
-	//paintArm.translate(0, axis1Num * SLIDE_AMOUNT, 0);
-	paintArm.translate(0, amtT, 0);
-	//paintArm.rotate(1, axis2Num * ROTATE_AMOUNT);
-	paintArm.rotate(1, deg1);
-	//paintArm.rotate(2, axis3Num * ROTATE_AMOUNT);
-	paintArm.rotate(2, deg2);
-	glutPostRedisplay();
 }
 
 void gotoRobotArea() {
@@ -109,47 +130,27 @@ void drawRobotAreaContents() {
 		glEnd();
 	}
 
-	Matrix* paintArmAxis00 = paintArm.get_T_Matrix(0, 0);
-	Matrix* paintArmAxis01 = paintArm.get_T_Matrix(0, 1);
-	Matrix* paintArmAxis02 = paintArm.get_T_Matrix(0, 2);
-	Matrix* paintArmAxis03 = paintArm.get_T_Matrix(0, 3);
-
-	double paintArmAxis00X = paintArmAxis01->get_elem(0, 3);
-	double paintArmAxis00Y = paintArmAxis01->get_elem(1, 3);
-
-	double paintArmAxis01X = paintArmAxis01->get_elem(0, 3);
-	double paintArmAxis01Y = paintArmAxis01->get_elem(1, 3);
-
-	double paintArmAxis02X = paintArmAxis02->get_elem(0, 3);
-	double paintArmAxis02Y = paintArmAxis02->get_elem(1, 3);
-
-	double paintArmAxis03X = paintArmAxis03->get_elem(0, 3);
-	double paintArmAxis03Y = paintArmAxis03->get_elem(1, 3);
-
-	//Point midpoint01 = paintArmAxisMidpoint(0, 1);
-	//Point midpoint12 = paintArmAxisMidpoint(1, 2);
-	//Point midpoint23 = paintArmAxisMidpoint(2, 3);
-
-	//printf("Draw: Joint %d at (%d, %d)\n", 3, paintArmAxis03X, paintArmAxis03Y);
-
-	
+	Point j0 = getJointCoord(0);
+	Point j1 = getJointCoord(1);
+	Point j2 = getJointCoord(2);
+	Point j3 = getJointCoord(3);
 
 	glBegin(GL_LINES);
 	glColor3f(107.0f / 255.0f, 0.0f, 0.0f);
-	glVertex2f(paintArmAxis00X, 0);
-	glVertex2f(paintArmAxis01X, -paintArmAxis01Y);
+	glVertex2f(j0.x, 0);
+	glVertex2f(j1.x, -j1.y);
 	glEnd();
 
 	glBegin(GL_LINES);
 	glColor3f(0.0f, 107.0f / 255.0f, 0.0f);
-	glVertex2f(paintArmAxis01X, -paintArmAxis01Y);
-	glVertex2f(paintArmAxis02X, -paintArmAxis02Y);
+	glVertex2f(j1.x, -j1.y);
+	glVertex2f(j2.x, -j2.y);
 	glEnd();
 
 	glBegin(GL_LINES);
 	glColor3f(0.0f, 0.0f, 107.0f / 255.0f);
-	glVertex2f(paintArmAxis02X, -paintArmAxis02Y);
-	glVertex2f(paintArmAxis03X, -paintArmAxis03Y);
+	glVertex2f(j2.x, -j2.y);
+	glVertex2f(j3.x, -j3.y);
 	glEnd();
 
 	glColor3f(0.0f, 1.0f, 0.0f);
@@ -272,7 +273,7 @@ void draw() {
 	glFlush();
 }
 void paintCircle() {
-	Point endEffector = paintArm.getEndEffectorCoords();
+	Point endEffector = getJointCoord(3);
 	PaintCircle circle = { endEffector, Color(paintBrushColor.r, paintBrushColor.g, paintBrushColor.b) };
 	paint.push_back(circle);
 }
@@ -281,73 +282,38 @@ void paintCircle() {
 * Button Callbacks
 */
 void axis1IncrementButtonCallback() {
-	// move axis1 1px right
-	printf("Axis 1 Increment Button Pressed!\n");
-	if (abs(axis1Num * SLIDE_AMOUNT + SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
-		axis1Num++;
-		paintArm.translate(0, 1, 0);
-		resetPaintArm();
-		if (paintButtonMode) paintCircle();
-		paintRobotSleep(JOINT_SLEEP_TIME);
-	}
-	else {
-		std::cout << "ERROR: Cannot move base off of slide!" << std::endl;
-	}
+	sendData("j0+");
+	if (paintButtonMode) paintCircle();
 }
 
 void axis1DecrementButtonCallback() {
-	// move axis1 1px left
-	printf("Axis 1 Decrement Button Pressed!\n");
-	if (abs(axis1Num * SLIDE_AMOUNT - SLIDE_AMOUNT) <= SLIDE_LENGTH / 2) {
-		axis1Num--;
-		paintArm.translate(0, -1, 0);
-		resetPaintArm();
-		if (paintButtonMode) paintCircle();
-		paintRobotSleep(JOINT_SLEEP_TIME);
-	}
-	else {
-		std::cout << "ERROR: Cannot move base off of slide!" << std::endl;
-	}
+	sendData("j0-");
+	if (paintButtonMode) paintCircle();
 }
 
 void axis2IncrementButtonCallback() {
-	// rotate axis2 +1 degree
-	printf("Axis 2 Increment Button Pressed!\n");
-	axis2Num--;
-	paintArm.rotate(1, -1);
-	resetPaintArm();
+	sendData("j1-");
 	if (paintButtonMode) paintCircle();
-	paintRobotSleep(JOINT_SLEEP_TIME);
 }
 
 void axis2DecrementButtonCallback() {
-	// rotate axis2 -1 degree
-	printf("Axis 2 Decrement Button Pressed!\n");
-	axis2Num++;
-	paintArm.rotate(1, 1);
-	resetPaintArm();
+	sendData("j1+");
 	if (paintButtonMode) paintCircle();
-	paintRobotSleep(JOINT_SLEEP_TIME);
 }
 
 void axis3IncrementButtonCallback() {
-	// rotate axis3 +1 degree
-	printf("Axis 3 Increment Button Pressed!\n");
-	axis3Num--;
-	paintArm.rotate(2, -1);
-	resetPaintArm();
+	sendData("j2-");
 	if (paintButtonMode) paintCircle();
-	paintRobotSleep(JOINT_SLEEP_TIME);
 }
 
 void axis3DecrementButtonCallback() {
-	// rotate axis3 -1 degree
-	printf("Axis 3 Decrement Button Pressed!\n");
-	axis3Num++;
-	paintArm.rotate(2, 1);
-	resetPaintArm();
+	sendData("j2+");
 	if (paintButtonMode) paintCircle();
-	paintRobotSleep(JOINT_SLEEP_TIME);
+}
+
+void delayButtonCallback() {
+	printf("Delay Button Pressed!\n");
+	delayButtonMode = !delayButtonMode;
 }
 
 void paintButtonCallback() {
@@ -365,10 +331,7 @@ void clearButtonCallback() {
 void resetButtonCallback() {
 	printf("Reset Button Pressed!\n");
 	paint.clear();
-	paintArm = (*new PaintArm());
-	axis1Num = 0;
-	axis2Num = 0;
-	axis3Num = 0;
+	sendData("r");
 	controlPanelButtons["paint"].mode = 0;
 	controlPanelButtons["paint"].state = 0;
 	paintButtonMode = 0;
@@ -439,50 +402,33 @@ void colorGreenButtonCallback() {
 	glutPostRedisplay();
 }
 
-void changeEndEffector(double dx, double dy) {
-	//Point endEffector = paintArm.getEndEffectorCoords();
-	Matrix* matrixT = paintArm.get_T_Matrix(0, 3);
-	double joint_x = matrixT->get_elem(0, 3);
-	double joint_y = matrixT->get_elem(1, 3);
-	std::cout << "changeEndEffector: Joint 3 at (" << joint_x << ", " << joint_y << ")" << std::endl;
-
-	double endPosX = joint_x;//endEffector.x + dx;
-	double endPosY = joint_y;//endEffector.y + dy;
-	int invkin = paintArm.calc_Inverse_Kinematics(endPosX, endPosY);
-
-	if (invkin == 0) {
-		//it is reachable!
-		//TODO update/redraw arm, don't reset it's position
-		std::cout << "Redrawing" << std::endl;
-		resetPaintArm();
-		if (paintButtonMode) paintCircle();
-		paintRobotSleep(JOINT_SLEEP_TIME);
-	} else if (invkin == 1) {
-		//error
-		printf("Error: point not reachable:\n%d, %d\n", endPosX, endPosY);
-	} else {
-		printf("Unknown Error: %i\n", invkin);
-	}
-}
 
 void worldXDecrementButtonCallback() {
 	printf("World X Decrement Button Pressed!\n");
-	changeEndEffector(-1.0, 0.0);
+	//changeEndEffector(-1.0, 0.0);
+	std::string response = sendData("wx-");
+	if (response == "1" && paintButtonMode) paintCircle();
 }
 
 void worldXIncrementButtonCallback() {
 	printf("World X Increment Button Pressed!\n");
-	changeEndEffector(1.0, 0.0);
+	//changeEndEffector(1.0, 0.0);
+	std::string response = sendData("wx+");
+	if (response == "1" && paintButtonMode) paintCircle();
 }
 
 void worldYDecrementButtonCallback() {
 	printf("World Y Decrement Button Pressed!\n");
-	changeEndEffector(0.0, -1.0);
+	//changeEndEffector(0.0, -1.0);
+	std::string response = sendData("wy-");
+	if (response == "1" && paintButtonMode) paintCircle();
 }
 
 void worldYIncrementButtonCallback() {
 	printf("World Y Increment Button Pressed!\n");
-	changeEndEffector(0.0, 1.0);
+	//changeEndEffector(0.0, 1.0);
+	std::string response = sendData("wy+");
+	if (response == "1" && paintButtonMode) paintCircle();
 }
 
 /* Initialization Functions */
@@ -493,17 +439,20 @@ void initJointButtons() {
 	int decrementButtonX = 0.07 * controlPanelWidth + controlPanelJointOriginX;
 	int incrementButtonX = (controlPanelWidth / 2) + 0.025 * controlPanelWidth + controlPanelJointOriginX;
 
+	int delayButtonY = 0.07 * controlPanelJointHeight + controlPanelJointOriginY;
+	Button delayButton = { decrementButtonX, delayButtonY, 2 * buttonWidth, 25, Button::TOGGLE, 0, 0, 0, "Delay", delayButtonCallback, 1 };
+
 	int axis1ButtonY = 0.20 * controlPanelJointHeight + controlPanelJointOriginY;
-	Button axis1DecrementButton = { decrementButtonX, axis1ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "-1", axis1DecrementButtonCallback, 0 };
-	Button axis1IncrementButton = { incrementButtonX, axis1ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "+1", axis1IncrementButtonCallback, 0 };
+	Button axis1DecrementButton = { decrementButtonX, axis1ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "-1", axis1DecrementButtonCallback, 1 };
+	Button axis1IncrementButton = { incrementButtonX, axis1ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "+1", axis1IncrementButtonCallback, 1 };
 
 	int axis2ButtonY = 0.35 * controlPanelJointHeight + controlPanelJointOriginY;
-	Button axis2DecrementButton = { decrementButtonX, axis2ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "-1", axis2DecrementButtonCallback, 0 };
-	Button axis2IncrementButton = { incrementButtonX, axis2ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "+1", axis2IncrementButtonCallback, 0 };
+	Button axis2DecrementButton = { decrementButtonX, axis2ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "-1", axis2DecrementButtonCallback, 1 };
+	Button axis2IncrementButton = { incrementButtonX, axis2ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "+1", axis2IncrementButtonCallback, 1 };
 
 	int axis3ButtonY = 0.50 * controlPanelJointHeight + controlPanelJointOriginY;
-	Button axis3DecrementButton = { decrementButtonX, axis3ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "-1", axis3DecrementButtonCallback, 0 };
-	Button axis3IncrementButton = { incrementButtonX, axis3ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "+1", axis3IncrementButtonCallback, 0 };
+	Button axis3DecrementButton = { decrementButtonX, axis3ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "-1", axis3DecrementButtonCallback, 1 };
+	Button axis3IncrementButton = { incrementButtonX, axis3ButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "+1", axis3IncrementButtonCallback, 1 };
 
 	int clearButtonY = 0.65 * controlPanelJointHeight + controlPanelJointOriginY;
 	Button clearButton = { decrementButtonX, clearButtonY, buttonWidth, 25, Button::PRESS, 0, 0, 0, "Clear Paint", clearButtonCallback, 1 };
@@ -516,6 +465,8 @@ void initJointButtons() {
 	int colorRow2ButtonY = 0.80 * controlPanelJointHeight + 30 + controlPanelJointOriginY;
 	Button colorBlueButton = { decrementButtonX, colorRow2ButtonY, buttonWidth, 25, Button::TOGGLE, 0, 0, 0, "Blue", colorBlueButtonCallback, 1 };
 	Button colorGreenButton = { incrementButtonX, colorRow2ButtonY, buttonWidth, 25, Button::TOGGLE, 0, 0, 0, "Green", colorGreenButtonCallback, 1 };
+
+	controlPanelButtons["delay"] = delayButton;
 
 	controlPanelButtons["axis1Decrement"] = axis1DecrementButton;
 	controlPanelButtons["axis1Increment"] = axis1IncrementButton;
@@ -548,16 +499,16 @@ void initWorldButtons() {
 	Button paintButton = { colButtonX, paintButtonY, buttonWidth, buttonHeight, Button::TOGGLE, 0, 0, 0, "Paint", paintButtonCallback, 1 };
 
 	int decrementButtonXX = colButtonX - buttonWidth - 10;
-	Button xDecrementButton = { decrementButtonXX, rowButtonY, buttonWidth, buttonHeight, Button::PRESS, 0, 0, 0, "-1", worldXDecrementButtonCallback, 0 };
+	Button xDecrementButton = { decrementButtonXX, rowButtonY, buttonWidth, buttonHeight, Button::PRESS, 0, 0, 0, "-1", worldXDecrementButtonCallback, 1 };
 
 	int incrementButtonXX = colButtonX + buttonWidth + 10;
-	Button xIncrementButton = { incrementButtonXX, rowButtonY, buttonWidth, buttonHeight, Button::PRESS, 0, 0, 0, "+1", worldXIncrementButtonCallback, 0 };
+	Button xIncrementButton = { incrementButtonXX, rowButtonY, buttonWidth, buttonHeight, Button::PRESS, 0, 0, 0, "+1", worldXIncrementButtonCallback, 1 };
 
 	int decrementButtonYY = rowButtonY + buttonHeight + 10;
-	Button yDecrementButton = { colButtonX, decrementButtonYY, buttonWidth, buttonHeight, Button::PRESS, 0, 0, 0, "-1", worldYDecrementButtonCallback, 0 };
+	Button yDecrementButton = { colButtonX, decrementButtonYY, buttonWidth, buttonHeight, Button::PRESS, 0, 0, 0, "-1", worldYDecrementButtonCallback, 1 };
 
 	int incrementButtonYY = rowButtonY - buttonHeight - 10;
-	Button yIncrementButton = { colButtonX, incrementButtonYY, buttonWidth, buttonHeight, Button::PRESS, 0, 0, 0, "+1", worldYIncrementButtonCallback, 0 };
+	Button yIncrementButton = { colButtonX, incrementButtonYY, buttonWidth, buttonHeight, Button::PRESS, 0, 0, 0, "+1", worldYIncrementButtonCallback, 1 };
 
 	controlPanelButtons["paint"] = paintButton;
 	controlPanelButtons["xDecrement"] = xDecrementButton;
@@ -779,11 +730,30 @@ void keyboard(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
+void specialInput(int key, int x, int y) {
+	switch (key) {
+	case GLUT_KEY_UP:
+		worldYIncrementButtonCallback();
+		break;
+	case GLUT_KEY_DOWN:
+		worldYDecrementButtonCallback();
+		break;
+	case GLUT_KEY_LEFT:
+		worldXIncrementButtonCallback();
+		break;
+	case GLUT_KEY_RIGHT:
+		worldXDecrementButtonCallback();
+		break;
+	}
+	glutPostRedisplay();
+}
+
 void initGraphics() {
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glMatrixMode(GL_PROJECTION);
 	gluOrtho2D(0, WINDOW_WIDTH - 1, WINDOW_HEIGHT - 1, 0);
 }
+
 
 int main(int argc, char **argv)
 {
@@ -797,10 +767,131 @@ int main(int argc, char **argv)
 	glutMotionFunc(mouseMotion);
 	glutPassiveMotionFunc(mousePassiveMotion);
 	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(specialInput);
 
 	initGraphics();
 	initJointButtons();
 	initWorldButtons();
 
+	//glutMainLoop();
+
+
+
+
+	WSADATA wsaData;
+	//SOCKET ConnectSocket = INVALID_SOCKET;
+	struct addrinfo *result = NULL,
+		*ptr = NULL,
+		hints;
+	char *sendbuf = "this is a test";
+	
+
+	// Validate the parameters
+	if (argc != 2) {
+		//printf("usage: %s server-name\n", argv[0]);
+		//return 1;
+		argv[1] = "127.0.0.1";
+	}
+
+	// Initialize Winsock
+	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (iResult != 0) {
+		printf("WSAStartup failed with error: %d\n", iResult);
+		return 1;
+	}
+
+	ZeroMemory(&hints, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+
+	// Resolve the server address and port
+	iResult = getaddrinfo(argv[1], DEFAULT_PORT, &hints, &result);
+	if (iResult != 0) {
+		printf("getaddrinfo failed with error: %d\n", iResult);
+		WSACleanup();
+		return 1;
+	}
+
+	// Attempt to connect to an address until one succeeds
+	for (ptr = result; ptr != NULL; ptr = ptr->ai_next) {
+
+		// Create a SOCKET for connecting to server
+		ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype,
+			ptr->ai_protocol);
+		if (ConnectSocket == INVALID_SOCKET) {
+			printf("socket failed with error: %ld\n", WSAGetLastError());
+			WSACleanup();
+			return 1;
+		}
+
+		// Connect to server.
+		iResult = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+		if (iResult == SOCKET_ERROR) {
+			closesocket(ConnectSocket);
+			ConnectSocket = INVALID_SOCKET;
+			continue;
+		}
+		break;
+	}
+
+	freeaddrinfo(result);
+
+	if (ConnectSocket == INVALID_SOCKET) {
+		printf("Unable to connect to server!\n");
+		WSACleanup();
+		return 1;
+	}
+
+
+
+
+
 	glutMainLoop();
+
+
+
+
+	// Send an initial buffer
+	iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
+	//iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
+	if (iResult == SOCKET_ERROR) {
+		printf("send failed with error: %d\n", WSAGetLastError());
+		closesocket(ConnectSocket);
+		WSACleanup();
+		return 1;
+	}
+
+	printf("Bytes Sent: %ld\n", iResult);
+
+	// shutdown the connection since no more data will be sent
+	iResult = shutdown(ConnectSocket, SD_SEND);
+	if (iResult == SOCKET_ERROR) {
+		printf("shutdown failed with error: %d\n", WSAGetLastError());
+		closesocket(ConnectSocket);
+		WSACleanup();
+		return 1;
+	}
+
+	// Receive until the peer closes the connection
+	do {
+
+		iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+		if (iResult > 0)
+			printf("Bytes received: %d\n", iResult);
+		else if (iResult == 0)
+			printf("Connection closed\n");
+		else
+			printf("recv failed with error: %d\n", WSAGetLastError());
+
+	} while (iResult > 0);
+
+	// cleanup
+	closesocket(ConnectSocket);
+	WSACleanup();
+
+	return 0;
+
+
+
 }
